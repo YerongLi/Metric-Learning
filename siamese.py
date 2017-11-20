@@ -2,7 +2,7 @@ import tensorflow as tf
 import itertools as it
 import numpy as np
 import pickle as pkl
-
+from matplotlib import pyplot as plt
 
 class MnistData:
     def __init__(self):
@@ -48,6 +48,9 @@ class MnistData:
             similarity.append([0])
         return np.array(left), np.array(right), np.array(similarity)
 
+    def get_test(self):
+        return np.array(self.test_images), np.array(self.test_labels)
+
 
 def weight_variable(shape, name):
     initial = tf.truncated_normal(shape, stddev=0.1)
@@ -74,25 +77,25 @@ W_conv2 = weight_variable([5, 5, 32, 64], 'Wc2')  # height, width, input channel
 b_conv2 = bias_variable([64], 'bc2')  # one bias for a convolutional branch
 W_fc1 = weight_variable([7 * 7 * 64, 1024], 'Wf1') # 28 / 2 / 2 = 7, 64 channels, 1024
 b_fc1 = bias_variable([1024], 'bf1')               # each entry has its bias
-W_fc2 = weight_variable([1024, 10], 'Wf2')
-b_fc2 = bias_variable([10], 'bf2')
+W_fc2 = weight_variable([1024, 2], 'Wf2')
+b_fc2 = bias_variable([2], 'bf2')
 
 
 def build_network(x_image):
     # 1st convolutional layer
-    h_conv1 = tf.nn.relu(conv2d(x_image, W_conv1) + b_conv1) # How does dimension of b_conv1 extended?
+    h_conv1 = tf.nn.tanh(conv2d(x_image, W_conv1) + b_conv1) # How does dimension of b_conv1 extended?
     h_pool1 = max_pool_2x2(h_conv1)
 
     # 2nd convolutional layer
-    h_conv2 = tf.nn.relu(conv2d(h_pool1, W_conv2) + b_conv2)
+    h_conv2 = tf.nn.tanh(conv2d(h_pool1, W_conv2) + b_conv2)
     h_pool2 = max_pool_2x2(h_conv2)
 
     # densely connected layer
     h_pool2_flat = tf.reshape(h_pool2, [-1, 7 * 7 * 64]) # keep first dimension unchanged, other dimensions reshape into one
-    h_fc1 = tf.nn.relu(h_pool2_flat @ W_fc1 + b_fc1)
+    h_fc1 = tf.nn.tanh(h_pool2_flat @ W_fc1 + b_fc1)
 
     # Readout
-    return tf.matmul(h_fc1, W_fc2) + b_fc2
+    return h_fc1 @ W_fc2 + b_fc2
 
 left_input = tf.placeholder(tf.float32, [None, 28, 28, 1], name='left_input')
 right_input = tf.placeholder(tf.float32, [None, 28, 28, 1], name='right_input')
@@ -100,6 +103,10 @@ label_input = tf.placeholder(tf.float32, [None, 1], name='label_input')
 
 left_output = build_network(left_input)
 right_output = build_network(right_input)
+
+with tf.device('/cpu:0'):
+    test_input = tf.placeholder(tf.float32, [None, 28, 28, 1], name='test_input')
+    test_output = build_network(test_input)
 
 def calc_loss(model1, model2, y, margin):
     with tf.name_scope("contrastive-loss"):
@@ -112,12 +119,30 @@ margin = 0.2
 total_loss = calc_loss(left_output, right_output, label_input, margin)
 
 optimizer = tf.train.MomentumOptimizer(0.01, 0.99, use_nesterov=True).minimize(total_loss)
+#optimizer = tf.train.MomentumOptimizer(0.01, 0.99, use_nesterov=True).minimize(total_loss)
 
 data = MnistData()
 
 with tf.Session() as sess:
     sess.run(tf.global_variables_initializer())
-    for i in range(100):
+
+    images, labels = data.get_test()
+    output = sess.run(test_output, feed_dict={test_input: images})
+    plt.scatter(output[:, 0], output[:, 1], 5, labels)
+    plt.savefig('fig0.png')
+    plt.close()
+
+    for i in range(2000):
         left_images, right_images, labels = data.get_train_batch()
-        _, loss = sess.run([optimizer, total_loss], feed_dict={left_input: left_images, right_input: right_images, label_input: labels})
-        print(loss)
+        if (i + 1) % 100 == 0:
+            _, loss = sess.run([optimizer, total_loss], feed_dict={left_input: left_images, right_input: right_images, label_input: labels})
+            print(i+1, ': ', loss)
+        else:
+            sess.run(optimizer, feed_dict={left_input: left_images, right_input: right_images, label_input: labels})
+
+        if (i + 1) % 200 == 0:
+            images, labels = data.get_test()
+            output = sess.run(test_output, feed_dict={test_input: images})
+            plt.scatter(output[:,0], output[:,1], 5, labels)
+            plt.savefig('fig' + str(i + 1) + '.png')
+            plt.close()
