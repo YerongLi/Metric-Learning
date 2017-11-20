@@ -77,9 +77,10 @@ W_conv2 = weight_variable([5, 5, 32, 64], 'Wc2')  # height, width, input channel
 b_conv2 = bias_variable([64], 'bc2')  # one bias for a convolutional branch
 W_fc1 = weight_variable([7 * 7 * 64, 1024], 'Wf1') # 28 / 2 / 2 = 7, 64 channels, 1024
 b_fc1 = bias_variable([1024], 'bf1')               # each entry has its bias
-W_fc2 = weight_variable([1024, 2], 'Wf2')
-b_fc2 = bias_variable([2], 'bf2')
-
+W_fc2 = weight_variable([1024, 256], 'Wf2')
+b_fc2 = bias_variable([256], 'bf2')
+W_fc3 = weight_variable([256, 2], 'Wf3')
+b_fc3 = bias_variable([2], 'bf3')
 
 def build_network(x_image):
     # 1st convolutional layer
@@ -94,8 +95,12 @@ def build_network(x_image):
     h_pool2_flat = tf.reshape(h_pool2, [-1, 7 * 7 * 64]) # keep first dimension unchanged, other dimensions reshape into one
     h_fc1 = tf.nn.tanh(h_pool2_flat @ W_fc1 + b_fc1)
 
+    h_fc2 = tf.nn.tanh(h_fc1 @ W_fc2 + b_fc2)
+
+    h_fc3 = h_fc2 @ W_fc3 + b_fc3
+
     # Readout
-    return h_fc1 @ W_fc2 + b_fc2
+    return h_fc3
 
 left_input = tf.placeholder(tf.float32, [None, 28, 28, 1], name='left_input')
 right_input = tf.placeholder(tf.float32, [None, 28, 28, 1], name='right_input')
@@ -118,6 +123,7 @@ def calc_loss(model1, model2, y, margin):
 margin = 0.2
 total_loss = calc_loss(left_output, right_output, label_input, margin)
 
+optimizer = tf.train.AdamOptimizer(0.001).minimize(total_loss)
 optimizer = tf.train.MomentumOptimizer(0.01, 0.99, use_nesterov=True).minimize(total_loss)
 #optimizer = tf.train.MomentumOptimizer(0.01, 0.99, use_nesterov=True).minimize(total_loss)
 
@@ -128,11 +134,14 @@ with tf.Session() as sess:
 
     images, labels = data.get_test()
     output = sess.run(test_output, feed_dict={test_input: images})
-    plt.scatter(output[:, 0], output[:, 1], 5, labels)
+    for j in range(10):
+        plt.scatter(output[labels == j, 0], output[labels == j, 1], 5)
+    plt.legend([str(i) for i in range(10)])
+    plt.legend()
     plt.savefig('fig0.png')
     plt.close()
 
-    for i in range(2000):
+    for i in range(10000):
         left_images, right_images, labels = data.get_train_batch()
         if (i + 1) % 100 == 0:
             _, loss = sess.run([optimizer, total_loss], feed_dict={left_input: left_images, right_input: right_images, label_input: labels})
@@ -143,6 +152,8 @@ with tf.Session() as sess:
         if (i + 1) % 200 == 0:
             images, labels = data.get_test()
             output = sess.run(test_output, feed_dict={test_input: images})
-            plt.scatter(output[:,0], output[:,1], 5, labels)
+            for j in range(10):
+                plt.scatter(output[labels == j, 0], output[labels == j, 1], 5)
+            plt.legend([str(i) for i in range(10)])
             plt.savefig('fig' + str(i + 1) + '.png')
             plt.close()
