@@ -59,12 +59,13 @@ class MnistData():
         n = 5
         for i in range(10):
             for j in range(10):
-                l_yes = np.random.choice(self.images_in_label[i], n * 2, replace=False).tolist()
-                l_no = np.random.choice(self.images_in_label[j], n, replace=False).tolist()
-                for k in range(n):
-                    mid_images.append(self.train_images[l_yes.pop(), :, :, :])
-                    pos_images.append(self.train_images[l_yes.pop(), :, :, :])
-                    neg_images.append(self.train_images[l_no.pop(), :, :, :])
+                if j != i:
+                    l_yes = np.random.choice(self.images_in_label[i], n * 2, replace=False).tolist()
+                    l_no = np.random.choice(self.images_in_label[j], n, replace=False).tolist()
+                    for k in range(n):
+                        mid_images.append(self.train_images[l_yes.pop(), :, :, :])
+                        pos_images.append(self.train_images[l_yes.pop(), :, :, :])
+                        neg_images.append(self.train_images[l_no.pop(), :, :, :])
         return mid_images, pos_images, neg_images
 
     def get_test(self):
@@ -238,21 +239,21 @@ if __name__ == '__main__':
 
         for i in range(10000):
             mid_images, pos_images, neg_images = data.get_triplet_train_batch()
-            if (i + 1) % 1 == 0:
-                W0, b0 = sess.run([net.layers[0]['W'], net.layers[0]['b']])
-                W1, b1 = sess.run([net.layers[1]['W'], net.layers[1]['b']])
-                W2, b2 = sess.run([net.layers[2]['W'], net.layers[2]['b']])
-                W2, b2 = sess.run([net.layers[3]['W'], net.layers[3]['b']])
+            if (i + 1) % 100 == 0:
+                #W0, b0 = sess.run([net.layers[0]['W'], net.layers[0]['b']])
+                #W1, b1 = sess.run([net.layers[1]['W'], net.layers[1]['b']])
+                #W2, b2 = sess.run([net.layers[2]['W'], net.layers[2]['b']])
+                #W2, b2 = sess.run([net.layers[3]['W'], net.layers[3]['b']])
                 _, loss = sess.run([optimizer, total_loss],
                                    feed_dict={mid_input: mid_images, pos_input: pos_images, neg_input: neg_images})
-                if np.isnan(loss):
-                    print('!')
+                #if np.isnan(loss):
+                #    print('!')
                 print(i + 1, ': ', loss)
             else:
                 sess.run(optimizer,
                          feed_dict={mid_input: mid_images, pos_input: pos_images, neg_input: neg_images})
 
-            if (i + 1) % 200 == 0:
+            if (i + 1) % 500 == 0:
                 images, labels = data.get_test()
                 output = sess.run(test_output, feed_dict={test_input: images})
                 plot(output, labels, i + 1)
