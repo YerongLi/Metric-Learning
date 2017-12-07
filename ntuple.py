@@ -1,9 +1,9 @@
 import tensorflow as tf
+from tensorflow.examples.tutorials.mnist import input_data
 import itertools as it
 import numpy as np
 import pickle as pkl
 from matplotlib import pyplot as plt
-
 
 class MnistData():
     """
@@ -14,11 +14,11 @@ class MnistData():
             with open('mnist.pkl', 'rb') as file:
                 mnist = pkl.load(file)
         except IOError:
-            from tensorflow.examples.tutorials.mnist import input_data
+            
             mnist = input_data.read_data_sets("MNIST_data/", one_hot=False)
             with open('mnist.pkl', 'wb') as file:
                 pkl.dump(mnist, file)
-
+        
         self.train_images = mnist.train.images.reshape((-1, 28, 28, 1))
         self.train_labels = mnist.train.labels
         self.test_images = mnist.test.images.reshape((-1, 28, 28, 1))
@@ -31,7 +31,7 @@ class MnistData():
 
         for i in range(self.train_amt):
             self.images_in_label[self.train_labels[i]].append(i)
-
+        
 
     def get_siamese_train_batch(self):
         left_images = []
@@ -214,15 +214,17 @@ class Network:
 
 
 if __name__ == '__main__':
+    
     data = MnistData() # Dataset
+    
     net = Network(28, 28, 1) # Network
-
+    
     # Add layers to the network
     net.add_conv(5, 5, 2, 2, 32)
     net.add_conv(5, 5, 2, 2, 64)
     net.add_fc(1024) # the network will be flattened automatically
     net.add_fc(256)
-
+   
     # Build Siamese structure, will use GPU to calculate when possible
     mid_input = tf.placeholder(tf.float32, [None, 28, 28, 1], name='mid_input')
     pos_input = tf.placeholder(tf.float32, [None, 28, 28, 1], name='pos_input')
@@ -284,3 +286,4 @@ if __name__ == '__main__':
                 images, labels = data.get_test()
                 output = sess.run(test_output, feed_dict={test_input: images})
                 plot(output, labels, i + 1)
+	
