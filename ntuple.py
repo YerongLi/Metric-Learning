@@ -4,7 +4,8 @@ import itertools as it
 import numpy as np
 import pickle as pkl
 from matplotlib import pyplot as plt
-
+import math
+num_label = 10
 class MnistData():
     """
     Arrange MNIST data set to suit siamese networking training
@@ -51,6 +52,9 @@ class MnistData():
             right_images.append(self.train_images[l.pop(), :, :, :])
             labels.append([0])
         return left_images, right_images, labels
+    
+    def return_train_images(self, i):
+        return self.train_images[i, :, :, :]
 
     def get_triplet_train_batch(self):
         '''
@@ -74,25 +78,34 @@ class MnistData():
                         neg_images.append(self.train_images[l_no.pop(), :, :, :])
         return mid_images, pos_images, neg_images
 
-    def get_tuple_train_batch(self):
+    def get_tuple_train_batch(self, NUM=2):
         '''
-            Generate 450 pairs of triplets
+            Generate  pairs of NUM+1 tuplets
         '''
-        mid_images = []
-        pos_images = []
-        neg_images = []
-        n = 5
-        for i in range(10):
-            for j in range(10):
-                if j != i:
-                    l_yes = np.random.choice(self.images_in_label[i], n * 2, replace=False).tolist()
-                    l_no = np.random.choice(self.images_in_label[j], n, replace=False).tolist()
-                    for k in range(n):
-                        mid_images.append(self.train_images[l_yes.pop(), :, :, :])
-                        pos_images.append(self.train_images[l_yes.pop(), :, :, :])
-                        neg_images.append(self.train_images[l_no.pop(), :, :, :])
-        return mid_images, pos_images, neg_images
-    
+        samples= []
+        data = []
+        assert NUM < num_label, 'NUM has to be smaller than number of labels'
+        
+        number_group = math.ceil(float(500)/(NUM+1))
+        # number_group = 3 #DEBUG
+        for group in range(number_group):
+            label = np.random.permutation(range(num_label))[0:NUM]
+            
+            samples = [np.random.choice(self.images_in_label[label[i]], 2, replace=False).tolist() for i in range(NUM)]
+            print(samples, 'samples')
+            new_data = [[samples[i][np.random.choice([0,1])] for i in range(NUM)] for j in range(NUM)]
+            for i in range(NUM) : 
+                del new_data[i][i]
+                new_data[i] = samples[i]+new_data[i]
+            # print(new_data)
+            # print(self.return_train_images(new_data[0][0]))
+            data = data+list(map(self.return_train_images, new_data))
+            # print('data', data[0][0])
+        # print(data[0][0], "data")
+        # print(len(data))
+        return data
+
+        
     def get_test(self):
         return self.test_images, self.test_labels
 
@@ -215,8 +228,10 @@ class Network:
 
 if __name__ == '__main__':
     
+
     data = MnistData() # Dataset
-    
+    data.get_tuple_train_batch()
+    '''
     net = Network(28, 28, 1) # Network
     
     # Add layers to the network
@@ -287,3 +302,4 @@ if __name__ == '__main__':
                 output = sess.run(test_output, feed_dict={test_input: images})
                 plot(output, labels, i + 1)
 	
+            '''
