@@ -1,0 +1,14 @@
+<tf.Variable '0_conv_W:0' shape=(5, 5, 1, 32) dtype=float32_ref> <tf.Variable '0_conv_b:0' shape=(32,) dtype=float32_ref>
+<tf.Variable '1_conv_W:0' shape=(5, 5, 32, 64) dtype=float32_ref> <tf.Variable '1_conv_b:0' shape=(64,) dtype=float32_ref>
+2017-12-07 16:26:08.678271: I tensorflow/stream_executor/cuda/cuda_gpu_executor.cc:857] ARM64 does not support NUMA - returning NUMA node zero
+2017-12-07 16:26:08.678446: I tensorflow/core/common_runtime/gpu/gpu_device.cc:955] Found device 0 with properties: 
+name: NVIDIA Tegra X1
+major: 5 minor: 3 memoryClockRate (GHz) 0.072
+pciBusID 0000:00:00.0
+Total memory: 3.90GiB
+Free memory: 1.27GiB
+2017-12-07 16:26:08.678598: I tensorflow/core/common_runtime/gpu/gpu_device.cc:976] DMA: 0 
+2017-12-07 16:26:08.678646: I tensorflow/core/common_runtime/gpu/gpu_device.cc:986] 0:   Y 
+2017-12-07 16:26:08.678700: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1045] Creating TensorFlow device (/gpu:0) -> (device: 0, name: NVIDIA Tegra X1, pci bus id: 0000:00:00.0)
+Failed to get the number of CUDA devices: CUDA driver version is insufficient for CUDA runtime version
+
