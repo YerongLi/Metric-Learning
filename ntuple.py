@@ -53,6 +53,31 @@ class MnistData():
         return left_images, right_images, labels
 
     def get_triplet_train_batch(self):
+        '''
+            Generate 450 pairs of triplets
+        '''
+        mid_images = []
+        pos_images = []
+        neg_images = []
+        n = 5
+        for i in range(10):
+            for j in range(10):
+                if j != i:
+                    l_yes = np.random.choice(self.images_in_label[i], n * 2, replace=False).tolist() # 10 sample indices
+                    print(len(l_yes), 'len l_yes')
+                    l_no = np.random.choice(self.images_in_label[j], n, replace=False).tolist() # 5 samples indices
+                    print(l_no, 'len l_no')
+
+                    for k in range(n):
+                        mid_images.append(self.train_images[l_yes.pop(), :, :, :])
+                        pos_images.append(self.train_images[l_yes.pop(), :, :, :])
+                        neg_images.append(self.train_images[l_no.pop(), :, :, :])
+        return mid_images, pos_images, neg_images
+
+    def get_tuple_train_batch(self):
+        '''
+            Generate 450 pairs of triplets
+        '''
         mid_images = []
         pos_images = []
         neg_images = []
@@ -67,9 +92,6 @@ class MnistData():
                         pos_images.append(self.train_images[l_yes.pop(), :, :, :])
                         neg_images.append(self.train_images[l_no.pop(), :, :, :])
         return mid_images, pos_images, neg_images
-
-    def get_tuple_train_batch(self):
-	pass
     
     def get_test(self):
         return self.test_images, self.test_labels
@@ -243,6 +265,7 @@ if __name__ == '__main__':
 
         for i in range(10000):
             mid_images, pos_images, neg_images = data.get_triplet_train_batch()
+            print(i)
             if (i + 1) % 100 == 0:
                 #W0, b0 = sess.run([net.layers[0]['W'], net.layers[0]['b']])
                 #W1, b1 = sess.run([net.layers[1]['W'], net.layers[1]['b']])
