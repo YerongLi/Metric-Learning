@@ -1,0 +1,5 @@
+./report.fdb_latexmk
+./report.log
+./report.fls
+./report.synctex.gz
+./report.aux
