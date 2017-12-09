@@ -6,8 +6,8 @@ import pickle as pkl
 from matplotlib import pyplot as plt
 import math
 num_label = 10
-max_step = 10000
-div = 50
+max_step = 6
+div = 2
 class MnistData():
     """
     Arrange MNIST data set to suit siamese networking training
@@ -252,7 +252,12 @@ if __name__ == '__main__':
     pos_exp_dist = tf.exp(tf.norm(mid_output - pos_output, axis=1, keep_dims=True))
     neg_exp_dist = tf.exp(tf.norm(mid_output - neg_output, axis=1, keep_dims=True))
     sum_exp_dist = pos_exp_dist + neg_exp_dist
-
+    print(neg_output)
+    print(tf.shape(pos_output))
+    print(tf.shape(pos_exp_dist))
+    print(tf.shape(neg_output))
+    print(tf.shape(neg_exp_dist))
+    print(sum_exp_dist, 'sum_exp_dist')
     d_pos = pos_exp_dist / sum_exp_dist
     d_neg = neg_exp_dist / sum_exp_dist
 
