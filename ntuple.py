@@ -6,6 +6,10 @@ import pickle as pkl
 from matplotlib import pyplot as plt
 import math
 num_label = 10
+max_step =1000
+div = 2
+d = 3
+number_group = math.ceil(float(500)/d)
 class MnistData():
     """
     Arrange MNIST data set to suit siamese networking training
@@ -68,9 +72,9 @@ class MnistData():
             for j in range(10):
                 if j != i:
                     l_yes = np.random.choice(self.images_in_label[i], n * 2, replace=False).tolist() # 10 sample indices
-                    print(len(l_yes), 'len l_yes')
+                    # print(len(l_yes), 'len l_yes')
                     l_no = np.random.choice(self.images_in_label[j], n, replace=False).tolist() # 5 samples indices
-                    print(l_no, 'len l_no')
+                    # print(l_no, 'len l_no')
 
                     for k in range(n):
                         mid_images.append(self.train_images[l_yes.pop(), :, :, :])
@@ -78,7 +82,7 @@ class MnistData():
                         neg_images.append(self.train_images[l_no.pop(), :, :, :])
         return mid_images, pos_images, neg_images
 
-    def get_tuple_train_batch(self, NUM=2):
+    def get_tuple_train_batch(self, NUM=d):
         '''
             Generate  pairs of NUM+1 tuplets
         '''
@@ -86,24 +90,43 @@ class MnistData():
         data = []
         assert NUM < num_label, 'NUM has to be smaller than number of labels'
         
-        number_group = math.ceil(float(500)/(NUM+1))
+        # number_group = math.ceil(float(500)/(NUM+1))
         # number_group = 3 #DEBUG
         for group in range(number_group):
             label = np.random.permutation(range(num_label))[0:NUM]
             
             samples = [np.random.choice(self.images_in_label[label[i]], 2, replace=False).tolist() for i in range(NUM)]
-            print(samples, 'samples')
+            #  print(samples, 'samples')
             new_data = [[samples[i][np.random.choice([0,1])] for i in range(NUM)] for j in range(NUM)]
             for i in range(NUM) : 
                 del new_data[i][i]
                 new_data[i] = samples[i]+new_data[i]
-            # print(new_data)
-            # print(self.return_train_images(new_data[0][0]))
+   
             data = data+list(map(self.return_train_images, new_data))
-            # print('data', data[0][0])
-        # print(data[0][0], "data")
-        # print(len(data))
-        return data
+
+        return np.array(data)
+
+    def get_pair_train_batch(self, NUM=d):
+        '''
+            Generate  pairs of NUM+1 tuplets
+        '''
+        samples= []
+        data = []
+        assert NUM < num_label, 'NUM has to be smaller than number of labels'
+        
+
+        # number_group = 3 #DEBUG
+        piv = []
+        pos = [] 
+        for group in range(number_group):
+            labels = np.random.permutation(range(num_label))[0:NUM]
+            # piv.append([]); pos.append([])
+            for lbl in labels:
+                imgs = np.random.choice(self.images_in_label[lbl], 2, replace=False).tolist()
+                piv.append(self.train_images[imgs[0],:,:,:])
+                pos.append(self.train_images[imgs[1],:,:,:])
+
+        return piv, pos, d
 
         
     def get_test(self):
@@ -227,44 +250,46 @@ class Network:
 
 
 if __name__ == '__main__':
-    
-
     data = MnistData() # Dataset
-    data.get_tuple_train_batch()
-    '''
     net = Network(28, 28, 1) # Network
-    
+    # data.get_pair_train_batch()
     # Add layers to the network
     net.add_conv(5, 5, 2, 2, 32)
     net.add_conv(5, 5, 2, 2, 64)
     net.add_fc(1024) # the network will be flattened automatically
     net.add_fc(256)
-   
+
+    # cut distance for negative pairs
+    cut = tf.Variable(tf.constant(2.0), name= 'cut')
     # Build Siamese structure, will use GPU to calculate when possible
-    mid_input = tf.placeholder(tf.float32, [None, 28, 28, 1], name='mid_input')
+    piv_input = tf.placeholder(tf.float32, [None, 28, 28, 1], name='piv_input')
     pos_input = tf.placeholder(tf.float32, [None, 28, 28, 1], name='pos_input')
-    neg_input = tf.placeholder(tf.float32, [None, 28, 28, 1], name='neg_input')
+    # neg_input = tf.placeholder(tf.float32, [None, 28, 28, 1], name='neg_input')
 
-    mid_output = net.connect(mid_input)
+    piv_output = net.connect(piv_input)
     pos_output = net.connect(pos_input)
-    neg_output = net.connect(neg_input)
 
-    # Use CPU do run test (in case graphic memory is insufficient)
+    # neg_output = net.connect(neg_input)
     with tf.device('/cpu:0'):
         test_input = tf.placeholder(tf.float32, [None, 28, 28, 1], name='test_input')
-        test_output = net.connect(test_input)
+        test_output = net.connect(test_input)  
+    # print(tf.shape(piv_output)[0])
+    loss = []
+    
+    for idxGp in range(number_group):
+        for idx in range(d):
+            i = d*idxGp+idx
+            penalty = piv_output[i]*pos_output[i]-tf.exp(cut)
+            # print(penalty)
+            exponents =[piv_output[i]*pos_output[j]-penalty for j in range(d)]
+            tempLog =tf.log(tf.reduce_sum(tf.exp(exponents)))
+            loss.append(tempLog)
+    NORM = tf.norm(piv_output,axis=1, keep_dims=True) + tf.norm(pos_output,axis=1, keep_dims=True)
+    total_loss = tf.reduce_mean(loss)+tf.reduce_mean(tf.exp(NORM-1))**2*0.1
+    #total_loss = tf.reduce_mean(loss)+tf.reduce_mean(tf.exp(NORM-1))**2*0.01
 
-    pos_exp_dist = tf.exp(tf.norm(mid_output - pos_output, axis=1, keep_dims=True))
-    neg_exp_dist = tf.exp(tf.norm(mid_output - neg_output, axis=1, keep_dims=True))
-    sum_exp_dist = pos_exp_dist + neg_exp_dist
-
-    d_pos = pos_exp_dist / sum_exp_dist
-    d_neg = neg_exp_dist / sum_exp_dist
-
-    total_loss = tf.reduce_mean(d_pos ** 2) + tf.reduce_mean((d_neg - 1) ** 2)
-
-    optimizer = tf.train.MomentumOptimizer(0.01, 0.99, use_nesterov=True).minimize(total_loss)
-    # optimizer = tf.train.AdamOptimizer(0.001).minimize(total_loss)
+    #optimizer = tf.train.MomentumOptimizer(0.01, 0.99, use_nesterov=True).minimize(total_loss)
+    optimizer = tf.train.AdamOptimizer(0.001).minimize(total_loss)
 
     def plot(output, labels, num):
         for j in range(10):
@@ -280,26 +305,35 @@ if __name__ == '__main__':
         output = sess.run(test_output, feed_dict={test_input: images})
         plot(output, labels, 0)
 
-        for i in range(10000):
-            mid_images, pos_images, neg_images = data.get_triplet_train_batch()
-            print(i)
-            if (i + 1) % 100 == 0:
+        for i in range(max_step):
+            # mid_images, pos_images, neg_images = data.get_triplet_train_batch()
+            # test_batch = data.get_tuple_train_batch(NUM=2)
+            piv_images, pos_images, _ = data.get_pair_train_batch()
+
+            ## DEBUG
+            '''
+            print(type(mid_images))
+            print(np.array(mid_images).shape) 
+            print(np.array(test_batch).shape)           
+            '''
+            ## DEBUG
+            if (i + 1) % div == 0:
                 #W0, b0 = sess.run([net.layers[0]['W'], net.layers[0]['b']])
                 #W1, b1 = sess.run([net.layers[1]['W'], net.layers[1]['b']])
                 #W2, b2 = sess.run([net.layers[2]['W'], net.layers[2]['b']])
                 #W2, b2 = sess.run([net.layers[3]['W'], net.layers[3]['b']])
+                # _, loss = sess.run([optimizer, total_loss],
+                #                    feed_dict={mid_input: mid_images, pos_input: pos_images, neg_input: neg_images})#if np.isnan(loss):
                 _, loss = sess.run([optimizer, total_loss],
-                                   feed_dict={mid_input: mid_images, pos_input: pos_images, neg_input: neg_images})
-                #if np.isnan(loss):
+                                    feed_dict={piv_input: piv_images, pos_input: pos_images})  
+
                 #    print('!')
                 print(i + 1, ': ', loss)
             else:
                 sess.run(optimizer,
-                         feed_dict={mid_input: mid_images, pos_input: pos_images, neg_input: neg_images})
+                         feed_dict={piv_input: piv_images, pos_input: pos_images})
 
-            if (i + 1) % 500 == 0:
+            if (i + 1) % 30 == 0:
                 images, labels = data.get_test()
                 output = sess.run(test_output, feed_dict={test_input: images})
                 plot(output, labels, i + 1)
-	
-            '''
