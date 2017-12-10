@@ -8,7 +8,7 @@ import math
 num_label = 10
 max_step =1000
 div = 2
-d = 3
+d = 10
 number_group = math.ceil(float(500)/d)
 class MnistData():
     """
@@ -285,7 +285,7 @@ if __name__ == '__main__':
             tempLog =tf.log(tf.reduce_sum(tf.exp(exponents)))
             loss.append(tempLog)
     NORM = tf.norm(piv_output,axis=1, keep_dims=True) + tf.norm(pos_output,axis=1, keep_dims=True)
-    total_loss = tf.reduce_mean(loss)+tf.reduce_mean(tf.exp(NORM-1))**2*0.1
+    total_loss = tf.reduce_mean(loss)+tf.reduce_mean(NORM)**2*0.3
     #total_loss = tf.reduce_mean(loss)+tf.reduce_mean(tf.exp(NORM-1))**2*0.01
 
     #optimizer = tf.train.MomentumOptimizer(0.01, 0.99, use_nesterov=True).minimize(total_loss)
