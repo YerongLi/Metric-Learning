@@ -81,11 +81,9 @@ class MnistData():
                         pos_images.append(self.train_images[l_yes.pop(), :, :, :])
                         neg_images.append(self.train_images[l_no.pop(), :, :, :])
         return mid_images, pos_images, neg_images
-
+    '''
     def get_tuple_train_batch(self, NUM=d):
-        '''
-            Generate  pairs of NUM+1 tuplets
-        '''
+
         samples= []
         data = []
         assert NUM < num_label, 'NUM has to be smaller than number of labels'
@@ -105,7 +103,7 @@ class MnistData():
             data = data+list(map(self.return_train_images, new_data))
 
         return np.array(data)
-
+    '''
     def get_pair_train_batch(self, NUM=d):
         '''
             Generate  pairs of NUM+1 tuplets
