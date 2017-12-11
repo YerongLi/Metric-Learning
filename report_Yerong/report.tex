@@ -14,9 +14,9 @@
 % run, let it finish, and you should be clear).
 \usepackage[breaklinks=true,bookmarks=false]{hyperref}
 
-%\cvprfinalcopy % *** Uncomment this line for the final submission
+\cvprfinalcopy % *** Uncomment this line for the final submission
 
-\def\cvprPaperID{0000} % *** Enter the CVPR Paper ID here
+\def\cvprPaperID{****} % *** Enter the CVPR Paper ID here
 \def\httilde{\mbox{\tt\raisebox{-.5ex}{\symbol{126}}}}
 
 % Pages are numbered in submission mode, and unnumbered in camera-ready
@@ -83,7 +83,24 @@
 		\subsection{(N+1)-tuple Network}
 			As seem in the improvement Triplet Network is making, we can sample several negative examples for the training set, 
 			$$(x,x^+,x^-_1,x^-_2,\cdots x^-_{n-1})$$
-			But generating $M$ batches of samples like this requires lots of computation burden. So instead of generating $M\times(N+1)$ examples and calculate the loss on them, we generate $N$ pairs of images of the same type and distinct pairs of images are of different labels. 
+			But generating $M$ batches of samples like this requires lots of computation burden. So instead of generating $M\times(N+1)$ examples and calculate the loss on them, we generate $N$ pairs of images of the same type and distinct pairs of images are of different labels. And the corresponding $(N+1)-$pair loss is given by 
+			\begin{equation}
+				L(\{x_i,x_i^+\}^N_{i=1})=\frac{1}{N}\log(\sum_{i=1}^N\exp(\sum_{j=1}^Ny^T_iy_j^+-y_i^Ty_i^+))  \label{eq:n-pair}
+			\end{equation}
+			As observed in equation \ref{eq:n-pair}, if $\sum^N\limits_{i=1}\exp(y^T_iy_j^+-y_i^Ty_i^+)$ is negative then embeddings $\{C\cdot y_i,C\cdot y_i^+\}$ gives a lower loss with any negative constant $C$, thus restrictions on norm of embeddings are needed.\\
+			Several attempts have been made on restricting the norm of embeddings. While none of them shows better performance on metric learning. We adopt a solution described in the paper: Adding $L_2-$ norm for training embeddings in the loss function and this should not only constrain resulting embeddings in a reasonable range, but will also enhance convexity of the system.
+
+			\begin{align}
+				&L(\{x_i,x_i^+\}^N_{i=1})\notag\\
+				=&\frac{1}{N}\log(\sum_{i=1}^N\exp(\sum_{j=1}^Ny^T_iy_j^+-y_i^Ty_i^+))+ \frac{\lambda}{2N} \sum_{i=1}^N(\lVert y_i\rVert^2+ \lVert y^+_i\rVert^2)
+			\end{align}
+			\begin{figure}[t]
+\begin{center}
+%\fbox{\rule{0pt}{2in} \rule{0.9\linewidth}{0pt}}
+   \includegraphics[width=0.9\linewidth]{fig/fig150}
+\end{center}
+   \caption{3-pair loss with $\lambda L_2$ constraint and weight $\lambda=0.3$.}
+\end{figure}
 	\section{Implementations \label{sec:Impl}}
 	
 	
