@@ -65,9 +65,9 @@
 		\color{SaddleBrown} % SaddleBrown color for the introduction
 		
 		\section*{Introduction}
-		Metric learning is the task of learning a distance function on pair of objects. We experiment on three metric learning methods based on deep learning, including Siamese Network, Triplet Network and n-Tuple Network. The three approaches can be viewed as a framework that contains a set of network sharing parameters and a loss function integrating the outputs of the networks. The basic idea is to force the network to give shorter distance between similar instances and longer distance between dissimilar instances.
+		Metric learning is the task of learning a distance function on pair of objects. We experiment on three metric learning methods based on deep learning, including Siamese Network \cite{hadsell2006dimensionality}, Triplet Network \cite{DBLP:journals/corr/HofferA14} and n-Tuple Network \cite{sohn2016improved}. The three approaches can be viewed as frameworks that contain a set of networks sharing parameters and a loss function integrating the outputs of the networks. The basic idea is to force the network to give shorter distance between similar instances and longer distance between dissimilar instances.
 		
-		We wrote a wrapper class for the network to hide the low-level implementation, and focus on the design of the high-level frameworks and loss functions. In our experiment on MNIST dataset and a classic network structure, Siamese Network has a mediocre performance while Triplet Network produces better embeddings. We are not able to make the original n-Tuple Network work. However, we have tested a few modified versions of it, which keep the framework unchanged but use different loss functions.
+		We wrote a wrapper class for convolutional network to hide the low-level implementation, and focus on the design of the high-level frameworks and loss functions. In our experiment on MNIST dataset and a classic network structure, Siamese Network has a fair performance while Triplet Network produces better embeddings. We are not able to make the original n-Tuple Network work. However, we have tested a few modified versions of it, which keep the framework unchanged but use different loss functions.
 		
 		%----------------------------------------------------------------------------------------
 		%	OBJECTIVES
@@ -110,7 +110,6 @@
 		\begin{equation}
 		d_+ = \frac{\exp{(\lvert y-y_+ \rvert)}}{\exp{(\lvert y-y_+ \rvert)} + \exp{(\lvert y-y_- \rvert)}}
 		\end{equation}
-		and
 		\begin{equation}
 		d_- = \frac{\exp{(\lvert y-y_- \rvert)}}{\exp{(\lvert y-y_+ \rvert)} + \exp{(\lvert y-y_- \rvert)}}
 		\end{equation}
@@ -133,15 +132,17 @@
 		To facilitate our experiment, we write a wrapper class \verb|Network| for convolutional network, which provides three member functions \verb|add_conv()|, \verb|add_fc()| and \verb|connect()|. The implementation of a Triplet Network is as easy as follows.
 		\begin{verbatim}
 		net = Network(28, 28, 1, 2);
-		net.add_conv(5, 5, 2, 2, 32);    net.add_conv(5, 5, 2, 2, 64);
-		net.add_fc(1024);                net.add_fc(256);
+		net.add_conv(5, 5, 2, 2, 32);    
+		net.add_conv(5, 5, 2, 2, 64);
+		net.add_fc(1024);                
+		net.add_fc(256);
 		mid_output = net.connect(mid_input);
 		pos_output = net.connect(pos_input);
 		neg_output = net.connect(neg_input);
 		\end{verbatim}
-		However, the implementation of loss functions still needs hard work.
+		However, the implementation of loss functions is still on case-by-case basis.
 		\section*{Results}
-		The Siamese Network can separate the classes fairly. Interesting overlappings between digits ``9'', ``7'' and ``4'' and between digits ``2'' and ``3'' is observed. In Triplet Network, these overlappings are further suppressed, which leads to a better separation.
+		The Siamese Network can separate the classes fairly. Expectable overlappings between digits ``9'', ``7'' and ``4'' and between digits ``2'' and ``3'' is observed. In Triplet Network, these overlappings are further suppressed, which leads to a better separation.
 		\begin{center}\vspace{1cm}
 			\includegraphics[width=0.45\linewidth]{../report_shaoheng/siamese}
 			\includegraphics[width=0.45\linewidth]{../report_shaoheng/triplet}
@@ -162,7 +163,7 @@
 			\captionof{figure}{\color{Green} Top left: Original n-Tuple Network; Top right: n-Tuple Network with L2 Norm\\ Bottom left: n-Tuple Network with Triplet loss; Bottom right: n-Tuple Network with modified Triplet loss}
 		\end{center}\vspace{1cm}
 		
-		We directly use loss function on n-Tuple framework, which gives 90 triplets per 20 images, and produces a well separated but badly scattered figure. The reason may be the high dependency of the triplets. We designed a new loss function resembles the Triplet Network loss function but combines all 10 classes into one expression. As a result, the scattering is better but the separation is worse.
+		We directly use Triplet loss function on n-Tuple framework, which gives 90 triplets per 20 images, and produces a well separated but badly scattered figure. The reason of the strange scattering may be the high dependency of the triplets. To solve this problem, we designed a new loss function resembles the Triplet Network loss function but combines all 10 classes into one expression. As a result, the scattering is better but the separation is worse.
 		\begin{equation}
 		Loss = \frac{\exp{(\lvert y-y_+ \rvert)}}{\exp{(\lvert y-y_+ \rvert)} + \sum_i\exp{(\lvert y-y_-^i \rvert)}}
 		\end{equation}
@@ -176,8 +177,8 @@
 		
 		\begin{itemize}
 			\item Our wrapper class gives a good basis for metric learning experiments.
-			\item The Siamese Network and Triplet Network perform as expected. Triplet Network outperforms Siamese Network by reduce overlapping of digits that are easily get confused.
-			\item We are not able to reproduce the original n-Tuple Network, but we designed multiple loss function as partial fixes.
+			\item The Siamese Network and Triplet Network perform as expected. Triplet Network outperforms Siamese Network by reducing overlapping of digits that looks alike.
+			\item We are not able to reproduce the original n-Tuple Network, but we have designed multiple loss functions as partial fixes.
 		\end{itemize}
 		
 		\color{DarkSlateGray} % Set the color back to DarkSlateGray for the rest of the content
