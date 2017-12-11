@@ -236,18 +236,34 @@ if __name__ == '__main__':
     total_loss = sum(loss)
     '''
 
+
     for i in range(20):
         modes = tf.squeeze(tf.slice(reshaped_output, [i, 0, 0, 0], [1, 10, 1, 2]))
         mode = [tf.slice(modes, [j, 0], [1, 2]) for j in range(10)]
         against = tf.squeeze(tf.slice(reshaped_output, [i, 0, 1, 0], [1, 10, 1, 2]))
         for j in range(10):
             exp_dist = tf.exp(tf.norm(mode[j] - against, axis=1, keep_dims=True))
-            sum_exp_dist = tf.reduce_sum(exp_dist) + 8 * tf.slice(exp_dist, [j, 0], [1, 1])
-            loss.append((9 * tf.slice(exp_dist, [j, 0], [1, 1]) / sum_exp_dist) ** 2 / 10 / 20)
+            for k in range(10):
+                if k != j:
+                    renorm = tf.slice(exp_dist, [k, 0], [1, 1]) + tf.slice(exp_dist, [j, 0], [1, 1])
+                    pos_loss = (tf.slice(exp_dist, [j, 0], [1, 1]) / renorm) ** 2
+                    neg_loss = (tf.slice(exp_dist, [k, 0], [1, 1]) / renorm - 1) ** 2
+                    loss.append((pos_loss + neg_loss) / 10 / 20)
     total_loss = sum(loss)
 
-    #optimizer = tf.train.MomentumOptimizer(0.01, 0.99, use_nesterov=True).minimize(total_loss)
-    optimizer = tf.train.AdamOptimizer(0.001).minimize(total_loss)
+    '''
+    for i in range(20):
+        modes = tf.squeeze(tf.slice(reshaped_output, [i, 0, 0, 0], [1, 10, 1, 2]))
+        mode = [tf.slice(modes, [j, 0], [1, 2]) for j in range(10)]
+        against = tf.squeeze(tf.slice(reshaped_output, [i, 0, 1, 0], [1, 10, 1, 2]))
+        for j in range(10):
+            exp_dist = tf.exp(tf.norm(mode[j] - against, axis=1, keep_dims=True))
+            sum_exp_dist = tf.reduce_sum(exp_dist)
+            loss.append((tf.slice(exp_dist, [j, 0], [1, 1]) / sum_exp_dist) ** 2 / 10 / 20)
+    total_loss = sum(loss)
+'''
+    optimizer = tf.train.MomentumOptimizer(0.01, 0.99, use_nesterov=True).minimize(total_loss)
+    # optimizer = tf.train.AdamOptimizer(0.001).minimize(total_loss)
 
     def plot(output, labels, num):
         for j in range(10):

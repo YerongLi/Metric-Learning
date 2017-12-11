@@ -40,9 +40,10 @@ class MnistData():
         for i in range(10):
             n = 45
             l = np.random.choice(self.images_in_label[i], n * 2, replace=False).tolist()
-            left_images.append(self.train_images[l.pop(), :, :, :])
-            right_images.append(self.train_images[l.pop(), :, :, :])
-            labels.append([1])
+            for j in range(n):
+                left_images.append(self.train_images[l.pop(), :, :, :])
+                right_images.append(self.train_images[l.pop(), :, :, :])
+                labels.append([1])
 
         # impostor
         for i, j in it.combinations(range(10), 2):
@@ -50,7 +51,7 @@ class MnistData():
             left_images.append(self.train_images[l.pop(), :, :, :])
             right_images.append(self.train_images[l.pop(), :, :, :])
             labels.append([0])
-        return left_images, right_images, labels
+        return left_images, right_images, np.array(labels)
 
     def get_test(self):
         return self.test_images, self.test_labels
@@ -205,7 +206,7 @@ if __name__ == '__main__':
 
     optimizer = tf.train.MomentumOptimizer(0.01, 0.99, use_nesterov=True).minimize(total_loss)
 
-    def plot(output, num):
+    def plot(output, labels, num):
         for j in range(10):
             plt.scatter(output[labels == j, 0], output[labels == j, 1], 5)
         plt.legend([str(i) for i in range(10)])
@@ -217,7 +218,7 @@ if __name__ == '__main__':
 
         images, labels = data.get_test()
         output = sess.run(test_output, feed_dict={test_input: images})
-        plot(output, 0)
+        plot(output, labels, 0)
 
         for i in range(10000):
             left_images, right_images, labels = data.get_siamese_train_batch()
@@ -233,4 +234,4 @@ if __name__ == '__main__':
             if (i + 1) % 200 == 0:
                 images, labels = data.get_test()
                 output = sess.run(test_output, feed_dict={test_input: images})
-                plot(output, i + 1)
+                plot(output, labels, i + 1)
