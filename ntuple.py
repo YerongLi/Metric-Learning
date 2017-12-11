@@ -110,7 +110,7 @@ class MnistData():
         '''
         samples= []
         data = []
-        assert NUM < num_label, 'NUM has to be smaller than number of labels'
+        # assert NUM < num_label, 'NUM has to be smaller than number of labels'
         
 
         # number_group = 3 #DEBUG
