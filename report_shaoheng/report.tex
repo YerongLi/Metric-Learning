@@ -14,14 +14,14 @@
 % run, let it finish, and you should be clear).
 \usepackage[breaklinks=true,bookmarks=false]{hyperref}
 
-\cvprfinalcopy % *** Uncomment this line for the final submission
+%\cvprfinalcopy % *** Uncomment this line for the final submission
 
-\def\cvprPaperID{****} % *** Enter the CVPR Paper ID here
+\def\cvprPaperID{0000} % *** Enter the CVPR Paper ID here
 \def\httilde{\mbox{\tt\raisebox{-.5ex}{\symbol{126}}}}
 
 % Pages are numbered in submission mode, and unnumbered in camera-ready
 %\ifcvprfinal\pagestyle{empty}\fi
-\setcounter{page}{4321}
+\setcounter{page}{1}
 \begin{document}
 	
 	%%%%%%%%% TITLE
@@ -55,43 +55,228 @@
 	\section{Introduction}
 	Metric learning is the task of learning a distance function on pair of objects. The most trivial definition of distance of two instances (which can be two images, two sequences, etc.) is the Euclidean distance. However, Euclidean distance may not be a good indicator for specialized tasks, because it cannot represent the intrinsic structure of the data. Theoretically, many high dimensional datasets can be viewed as low dimensional manifold embedded in a high dimensional space, where Euclidean distance cannot capture the manifold.
 	
-	To solve this problem, many Metric learning algorithms are invented. The classical ones include Isomap, Locally Linear Embedding (LLE), Stochastic Neighbor Embedding, etc. These methods are all unsupervised methods. In the deep learning area, LeCun ??? introduces Siamese Network, which can be viewed as a framework including two neural networks of the same structure and sharing the same parameters and a loss function defines on the two outputs and the labels of the two inputs. Commonly, the loss function call for a small distance of the outputs when the two inputs are of the same label and vice versa. Elad Hoffer and Nir Ailon have invented Triplet Network ???, which is an extension of Siamese Network, but includes three networks. The Triplet Network processes two instances from one class and one instance from another class at the same time. ??? n-Tuple Network further generalize the idea of Triplet Network, where two instances from one class and multiple instances from the other classes are used at one time.
+	To solve this problem, many Metric learning algorithms are invented. The classical ones include Isomap, Locally Linear Embedding (LLE), Stochastic Neighbor Embedding, etc. These methods are all unsupervised methods. In the deep learning area, Raia Hadsell et~al. have introduced Siamese Network \cite{hadsell2006dimensionality}, which can be viewed as a framework including two neural networks of the same structure and sharing the same parameters and a loss function defines on the two outputs and the labels of the two inputs. Commonly, the loss function call for a small distance of the outputs when the two inputs are of the same label and vice versa. Elad Hoffer and Nir Ailon have invented Triplet Network \cite{DBLP:journals/corr/HofferA14}, which is an extension of Siamese Network, but includes three networks. The Triplet Network processes two instances from one class and one instance from another class at the same time. n-Tuple Network \cite{sohn2016improved} further generalize the idea of Triplet Network, where two instances from one class and multiple instances from the other classes are used at one time.\\
 	
-	We use two laptops to perform the experiments. One of them is equipped with Intel Core i7-5700HQ and NVidia 960M GPU. Another one has Intel Core i7-6500U and NVidia 940M GPU.
+	In section \ref{sec:mech} we show the mechanisms of the aforementioned deep learning methods in detail. Some important details about implementation is shown in section \ref{sec:Impl}. We show our experiments in and discusses the results in section \ref{sec:Res}. The conclusion is in section \ref{sec:Conc}\\
 	
-	In section \ref{sec:mech} we show the mechanisms of the aforementioned deep learning methods in detail. Some important details about implementation is shown in section \ref{sec:Impl}. We show our experiments and results in \ref{sec:Res}. We further discuss the phenomena shown in the experiments in section \ref{sec:Disc}.
+	We use two laptops to perform the experiments. One of them is equipped with Intel Core i7 5700HQ and NVidia 960M graphics. Another one has Intel Core i7-6500U and NVidia 940M GPU.
 	
 	\section{Mechanisms \label{sec:mech}}
 		\subsection{Siamese Network}
-			Siamese Network is a framework for metric learning. It contains two parts, the twin networks (In fact its name ``Siamese'' is related to twin) and the loss function. The structure of the framework is shown in figure ???. Each one of the twin networks takes one instance from the dataset, denoted as $x_1$ and $x_2$, and output the result $y_1 = Net(x_1)$ and $y_2 = Net(x_2)$ respectively. The loss function is defined as follows. \footnote{Expressions are slightly different from the original paper to keep consistent through our article.}
+			Siamese Network is a framework for metric learning. The structure is shown in figure \ref{fig:siamese_struct}.
+			
+			\begin{figure}[htbp]
+				\begin{center}
+					%\fbox{\rule{0pt}{2in} \rule{0.9\linewidth}{0pt}}
+					\includegraphics[width=0.9\linewidth]{siamese_struct}
+				\end{center}
+				\caption{Structure of Siamese Network.\label{fig:siamese_struct}}
+			\end{figure}
+			
+			It contains two parts, the twin networks (In fact its name ``Siamese'' is related to twin) and the loss function. The structure of the framework is shown in figure ???. Each one of the twin networks takes one instance from the dataset, denoted as $x_1$ and $x_2$, and output the result 
+			\begin{equation}
+				y_1 = Net(x_1);\; y_2 = Net(x_2)
+			\end{equation}
+			respectively. The loss function is defined as follows. \footnote{Expressions are slightly different from the original paper to keep consistent through our article.}
 			\begin{equation}
 				Loss = (1-S)L_S(\lvert y_1 - y_2 \rvert) + S L_D(\lvert y_1 - y_2 \rvert)
 			\end{equation}
 			where $L_S(\bullet)$ and $L_D(\bullet)$ stands for loss functions for similarity and dissimilarity respectively. When $x_1$ and $x_2$ are in the same class (or is similar on some perspective), label $S$ is set to be $1$, and the loss is caused by dissimilarity. When $x_1$ and $x_2$ are not in the same class, $Y$ is set to $0$ and gives a penalty on similarity. The formal definitions of the functions are as follows.
 
 			\begin{equation}
-				L_S = \frac{1}{2}\lVert y_1 - y_2 \rVert^2
+				L_S = \frac{1}{2}\lvert y_1 - y_2 \rvert^2
 			\end{equation}
 			\begin{equation}
-				L_D = \frac{1}{2}\{max(0, m-\lVert y_1-y_2\rVert)\}^2 \label{eq:negative}
+				L_D = \frac{1}{2}\{max(0, m-|y_1-y_2|)\}^2
 			\end{equation}
 			where $m$ is a positive parameter. Generally speaking, $L_D$ treats two points whose distance is more than $m$ as totally separated and puts no penalty on them.
 			
-			For a simple analysis, constrative term \ref{eq:negative} can be essential and $L_S$ is convex and can vanish to zero without it.
-		
+			When training using batches, we may simply average the loss function of several runs.
 		\subsection{Triplet Network}
-			Triplet Network is a enhanced version of Siamese Network, which processes similar instance and dissimilar instance at the same time. The structure of the framework is shown in figure ???. The loss function is not just the similarity or dissimilarity, but is based on comparison of the similarity of similar instances and dissimilarity of dissimilar instances. The 
+			Triplet Network is a enhanced version of Siamese Network, which processes similar instance and dissimilar instance at the same time. The structure of the framework is shown in figure \ref{fig:triplet_struct}. The loss function is not just the similarity or dissimilarity, but is based on comparison of the similarity of similar instances and dissimilarity of dissimilar instances. 
+			
+			\begin{figure}[htbp]
+				\begin{center}
+					%\fbox{\rule{0pt}{2in} \rule{0.9\linewidth}{0pt}}
+					\includegraphics[width=0.9\linewidth]{triplet_struct}
+				\end{center}
+				\caption{Structure of Triplet Network.\label{fig:triplet_struct}}
+			\end{figure}
+			
+			The framework takes three instances as input at one time. However, contrast with Siamese Network, the instances are not chosen totally randomly. Instead, we first choose one instance $x$ randomly, and then choose one instance $x_+$ from the same class as the positive example. Finally, we choose $x_-$ from another classes as the negative example. Three instances are fed to the network at one time and this is the origin of the name ``Triplet''. The output of the three instances are denoted as
+			\begin{equation}
+				y = Net(x);\; y_+ = Net(x_+);\; y_-=Net(x_-)
+			\end{equation}
+			
+			Formally, the loss function is defined as
+			\begin{equation}
+				Loss = \lvert(d_+, d_--1)\rvert^2 = const\bullet d_+^2
+			\end{equation}
+			where $d_+$ and $d_-$ are the normalized exponential distance, defined as follows.
+			\begin{equation}
+				d_+ = \frac{\exp{(\lvert y-y_+ \rvert)}}{\exp{(\lvert y-y_+ \rvert)} + \exp{(\lvert y-y_- \rvert)}}
+			\end{equation}
+			and
+			\begin{equation}
+				d_- = \frac{\exp{(\lvert y-y_- \rvert)}}{\exp{(\lvert y-y_+ \rvert)} + \exp{(\lvert y-y_- \rvert)}}
+			\end{equation}
+			This loss function call for a higher $\frac{\exp{(\lvert y-y_+ \rvert)}}{\exp{(\lvert y-y_+ \rvert)}}$ ratio, which means shorter distance for similar instances and longer distance for dissimilar instances.
+			
+			This framework can also use batched training by simply average the loss function over multiple triplets of input instances.
+			
+			\subsection{n-Tuple Network}
+
+				As seem in the improvement Triplet Network is making, we can sample several negative examples for the training set, 
+				$$(x,x^+,x^-_1,x^-_2,\cdots x^-_{n-1})$$
+				But generating $M$ batches of samples like this requires lots of computation burden. So instead of generating $M\times(N+1)$ examples and calculate the loss on them, we generate $N$ pairs of images of the same type and distinct pairs of images are of different labels. And the corresponding $(N+1)-$pair loss is given by 
+				\begin{equation}
+				L(\{x_i,x_i^+\}^N_{i=1})=\frac{1}{N}\log(\sum_{i=1}^N\exp(\sum_{j=1}^Ny^T_iy_j^+-y_i^Ty_i^+))  \label{eq:n-pair}
+				\end{equation}
+				As observed in equation \ref{eq:n-pair}, if $\sum^N\limits_{i=1}\exp(y^T_iy_j^+-y_i^Ty_i^+)$ is negative then embeddings $\{C\cdot y_i,C\cdot y_i^+\}$ gives a lower loss with any negative constant $C$, thus restrictions on norm of embeddings are needed. The structure is shown in figure \ref{fig:tuple_struct}.
+				
+				\begin{figure}[htbp]
+					\begin{center}
+						%\fbox{\rule{0pt}{2in} \rule{0.9\linewidth}{0pt}}
+						\includegraphics[width=0.9\linewidth]{tuple_struct}
+					\end{center}
+					\caption{Structure of Triplet Network.\label{fig:tuple_struct}}
+				\end{figure}
+				
+				One characteristic of n-Tuple Network is that n-Tuple Network leverages dot product instead of Euclidean distance as the approach to measure the distance of two outputs, which is different from the other two frameworks.
+
 	\section{Implementations \label{sec:Impl}}
+		As is mentioned above, these frameworks integrate multiple networks sharing parameters into one framework. We have two ways to achieve this. We may implement multiple networks but using the same parameters. We may also use only one network, feed the network with one set of well-arranged instances and slice the outputs when calculating the loss functions. For Siamese Network and Triplet Network, the first one is easier to implement. However, for n-Tuple network, the second one is more compact.
 	
-	
-	\section{Experiments and Results \label{sec:Res}}
-	
-	
-	\section{Discussion \label{sec:Disc}}
-	
+		To facilitate our experiment, we write a wrapper class \verb|Network| for convolutional network, which provides three member functions \verb|add_conv()|, \verb|add_fc()| and \verb|connect()|. \verb|add_conv()| and \verb|add_fc()| are used to declare new convolutional layer or fully connected layer into the network, while \verb|connect()| takes an input placeholder and output an output tensor. It is very easy to implement a convolutional network with this class.
+		
+		For example, when we want to implement a convolutional network on MNIST dataset, which consists of images of $28 \times 28$ pixels and $1$ channel, and embed it to a 2 dimensional vector, we simply write
+		\begin{verbatim}
+			net = Network(28, 28, 1, 2)
+		\end{verbatim}
+		We use a modified version of the most common structure of network, i.e. two convolutional layers followed by one fully connected layers. The convolutional layers are declared by
+		\begin{verbatim}
+			net.add_conv(5, 5, 2, 2, 32)
+			net.add_conv(5, 5, 2, 2, 64)
+		\end{verbatim}
+		which means two layers with $5\times 5$ convolutional kernels and $2\times 2$ max-pooling windows. The number of channels in output is $32$ and $64$ respectively.
+		The fully connected layers is
+		\begin{verbatim}
+			net.add_fc(1024)
+		\end{verbatim}
+		which means a fully connected layer whose output has 1024 dimensions. The class will automatically flatten the data when we stop adding convolutional layer and start to add fully connected layer. (And throw exception if we try to add a convolutional layer after flattening.)
+		
+		Because our task is different from the original network for classification, we add one more fully connected layer into the network
+		\begin{verbatim}
+			net.add_fc(256)
+		\end{verbatim}
+		
+		The dimensionality of data is handled by the class automatically so we do not need to  declare weight matrices manually and calculate their dimensionalities by hand.
+		
+		Then, we can write
+		\begin{verbatim}
+			output = net.connect(input)
+		\end{verbatim}
+		to finalize the network, in which output is the 2-dimensional output vector, while input is the placeholder to get input data. (The network will tacitly add a fully connected layer to further transform the 256-dimensional vectors into 2-dimensional vectors.)
+		
+		\subsection{Multiple Network Implementation}
+			On one perspective, the frameworks includes multiple parallel networks, so we call \verb|connect()| multiple times to connect multiple networks. Use Triplet Network as an example, we connect three networks for the three inputs \verb|mid_input| $x$, \verb|pos_input| $x_+$ and \verb|neg_input| $x_-$.
+			\begin{verbatim}
+				mid_output = net.connect(mid_input)
+				pos_output = net.connect(pos_input)
+				neg_output = net.connect(neg_input)
+			\end{verbatim}
+			In practice, the three inputs are all batches of instances, and the loss function are defined as average of each triplet.
+			
+		\subsection{Single Network Implementation}
+			On another perspective, the frameworks simply use one network to process all the inputs, and then separate the inputs into portions and define the loss function on them. Following this idea, we implement another version that only connect one network. We carefully arrange the input data, and slice the output data to rearrange the tuples.
+			
+			For example, we use 20 10-tuples in one batch, and each tuple includes 10 pairs instances, each of them is embedded to a 2-dimensional vector. We reshape the output as follows.
+			\begin{verbatim}
+				tf.reshape(output, [20, 10, 2, 2])
+			\end{verbatim}
+			Where the number 20, 10, 2 and 2 correspond to 20 tuples, 10-tuple, ``pair'' and 2-dimensional respectively.
+	\section{Experiments and Discussions \label{sec:Res}}
+		\subsection{Siamese Network}
+			The result of siamese network is shown in figure \ref{fig:siamese}. The 10 digits are fairly separated. We can still find some substructure of output that can be indicated by the input data. For example, digits 9 is confused with digits 7 and digit 4 some times. Digit 2 and 3 also have a confusion area. This is a good result in a sense because it is reasonable to see a shorter distance from ``9'' to ``7'' than from ``9'' to ``8'' based on their appearance.
+			\begin{figure}[htbp]
+				\begin{center}
+					%\fbox{\rule{0pt}{2in} \rule{0.9\linewidth}{0pt}}
+					\includegraphics[width=0.9\linewidth]{siamese}
+				\end{center}
+				\caption{Result of Siamese Network. The separation is fair. Some interesting substructure is notable (digit 4, 7 and 9; digit 2 and 3).\label{fig:siamese}}
+			\end{figure}	
+		\subsection{Triplet Network}
+			The result of siamese network is shown in figure \ref{fig:triplet}. The 10 digits are separated very well. Digits 9, 7 and 4 are separated better and digits 2 and 3 are also well separated. Interestingly, we can see that the clusters of digit 9, 7 and 4 and digits 2 and 3 are still close to each other, which means the substructure is somewhat remained in the output.
+			\begin{figure}[htbp]
+				\begin{center}
+					%\fbox{\rule{0pt}{2in} \rule{0.9\linewidth}{0pt}}
+					\includegraphics[width=0.9\linewidth]{triplet}
+				\end{center}
+				\caption{Result of Triplet Network.\label{fig:triplet}}
+			\end{figure}
+		\section{n-Tuple Network}
+			We implement the original n-Tuple network using 10-tuples. However, the result in figure \ref{fig:fail_tuple} shows that the output points collapsed into one very little area.
+			One possible reason could be that because the dot product is on points that are not normalized, all 0's could be a trivial solution of the problem.
+			
+				\begin{figure}[htbp]
+					\begin{center}
+						%\fbox{\rule{0pt}{2in} \rule{0.9\linewidth}{0pt}}
+						\includegraphics[width=0.9\linewidth]{fail_tuple}
+					\end{center}
+					\caption{Result of n-Tuple Network using 10-tuples. The points collapsed into a very little area.\label{fig:fail_tuple}}
+				\end{figure}
+			
+			Several attempts have been made on restricting the norm of embeddings. While none of them shows better performance on metric learning. We adopt a solution described in the paper: Adding $L_2-$ norm for training embeddings in the loss function and this should not only constrain resulting embeddings in a reasonable range, but will also enhance convexity of the system.
+			
+			\begin{align}
+			&L(\{x_i,x_i^+\}^N_{i=1})\notag\\
+			=&\frac{1}{N}\log(\sum_{i=1}^N\exp(\sum_{j=1}^Ny^T_iy_j^+-y_i^Ty_i^+))+ \frac{\lambda}{2N} \sum_{i=1}^N(\lVert y_i\rVert^2+ \lVert y^+_i\rVert^2)
+			\end{align}
+			
+			\begin{figure}[t]
+				
+				\begin{center}
+					\includegraphics[width=0.5\linewidth]{fig1000}\includegraphics[width=0.5\linewidth]{fig600}
+					\includegraphics[width=0.5\linewidth]{fig2500}
+					\caption{3-pair loss with constraint $\lambda (L_2)^2[\lambda=1.0]$ and $\lambda L_2[\lambda=1.0]$;10-pair loss with constraint $\lambda (L_2)^2[\lambda=1.0]$, and 10-pair sampling fails after long run}
+					%\fbox{\rule{0pt}{2in} \rule{0.9\linewidth}{0pt}}
+					\includegraphics[width=0.9\linewidth]{fig150}
+				\end{center}
+				\caption{3-pair loss with $\lambda L_2$ constraint and weight $\lambda=0.3$.  We also added negative cutoff $m$ in equation \ref{eq:negative}, this proves improve the training result.}
+				
+				
+				Another observation is that while optimizing contrastive loss and triplet loss is approachable for momentum optimizer, we could hardly optimize $(N+1)-$pair loss with it: it is harder to optimize $(N+1)-$pair loss. 
+			\end{figure}
+			
+			Inspired by the loss function of Triplet Network, we abandoned the dot product loss function and designed two new loss functions for n-Tuple network. They have better performance but still failed to outperform Triplet Network.
+			
+			The first function is exactly the Triplet Network loss function using each two instances from the same class in the tuple as positive examples, and 9 instances from other classes as negative examples. The loss function turned out to be too complicated and TensorFlow uses significantly more time to construct the ``graph''. The result is shown in figure \ref{fig:first_tuple}. We can see mediocre separation of data from different classes. However, the scattering of data is in very weird pattern, which may be a result of highly dependent input data (90 triplets are produced by one 10-tuple which contains 20 instances). 
+			
+			\begin{figure}[htbp]
+				\begin{center}
+					%\fbox{\rule{0pt}{2in} \rule{0.9\linewidth}{0pt}}
+					\includegraphics[width=0.9\linewidth]{first_tuple}
+				\end{center}
+				\caption{Result of n-Tuple Network using Triplet loss function. The separation is mediocre but the scattering of data is strange, which may caused by high dependency of input data.\label{fig:first_tuple}}
+			\end{figure}
+			
+			The second function is a combined version of n-Tuple and Triplet loss function. We still use Euclidean distance in the function, but only produce 10 loss value per 10-tuple. In specific, we extract 2 instances from the same class in one tuple to form $y$ and $y+$ and choose other 9 as $y_-^i$'s. One loss value is defined as
+			
+			\begin{equation}
+				\frac{\exp{(\lvert y-y_+ \rvert)}}{\exp{(\lvert y-y_+ \rvert)} + \sum_i\exp{(\lvert y-y_-^i \rvert)}}
+			\end{equation}
+			and the total loss is an average among the 10 loss values per tuple and also among 20 tuples. The result is shown in figure \ref{fig:second_tuple}. It can be observed that the scattering of data is more ``normal'', but only digit 0 and digit 6 has been better separated from the whole dataset.
+			
+			\begin{figure}[htbp]
+				\begin{center}
+					%\fbox{\rule{0pt}{2in} \rule{0.9\linewidth}{0pt}}
+					\includegraphics[width=0.9\linewidth]{second_tuple}
+				\end{center}
+				\caption{Result of n-Tuple network with combined loss function. The scattering of points looks more ``normal'' but has a worse separation.\label{fig:second_tuple}}
+			\end{figure}
 	
 	\section{Conclusion \label{sec:Conc}}
-	
+		We have implemented a backend for experimenting metric learning methods. We experimented three frameworks, Siamese Network, Triplet Network and n-Tuple Network on MNIST dataset. Siamese Network shows a fair performance while Triplet Network outperforms Siamese as expected. However, the original n-Tuple Network does not work in our experiments and our modification on the loss function gives a partly work version.
 	{\small
 		\bibliographystyle{ieee}
 		\bibliography{egbib}
