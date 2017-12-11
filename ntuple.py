@@ -6,8 +6,8 @@ import pickle as pkl
 from matplotlib import pyplot as plt
 import math
 num_label = 10
-max_step =1000
-div = 2
+max_step =10000
+div = 100
 d = 10
 number_group = math.ceil(float(500)/d)
 class MnistData():
@@ -331,7 +331,7 @@ if __name__ == '__main__':
                 sess.run(optimizer,
                          feed_dict={piv_input: piv_images, pos_input: pos_images})
 
-            if (i + 1) % 30 == 0:
+            if (i + 1) % 500 == 0:
                 images, labels = data.get_test()
                 output = sess.run(test_output, feed_dict={test_input: images})
                 plot(output, labels, i + 1)
