@@ -1,13 +1,20 @@
 \begin{thebibliography}{1}
 
-\bibitem{Smith:2013jd}
-A.~B. Jones and J.~M. Smith.
-\newblock {A}rticle {T}itle.
-\newblock {\em Journal title}, 13(52):123--456, March 2013.
+\bibitem{hadsell2006dimensionality}
+Raia Hadsell, Sumit Chopra, and Yann LeCun.
+\newblock Dimensionality reduction by learning an invariant mapping.
+\newblock In {\em Computer vision and pattern recognition, 2006 IEEE computer
+  society conference on}, volume~2, pages 1735--1742. IEEE, 2006.
 
-\bibitem{Smith:2012qr}
-J.~M. Smith and A.~B. Jones.
-\newblock {\em {B}ook {T}itle}.
-\newblock Publisher, 7th edition, 2012.
+\bibitem{DBLP:journals/corr/HofferA14}
+Elad Hoffer and Nir Ailon.
+\newblock Deep metric learning using triplet network.
+\newblock {\em CoRR}, abs/1412.6622, 2014.
+
+\bibitem{sohn2016improved}
+Kihyuk Sohn.
+\newblock Improved deep metric learning with multi-class n-pair loss objective.
+\newblock In {\em Advances in Neural Information Processing Systems}, pages
+  1857--1865, 2016.
 
 \end{thebibliography}

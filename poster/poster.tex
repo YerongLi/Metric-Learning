@@ -23,7 +23,7 @@
 \usepackage{multicol} % This is so we can have multiple columns of text side-by-side
 \columnsep=100pt % This is the amount of white space between the columns in the poster
 \columnseprule=3pt % This is the thickness of the black line between the columns in the poster
-
+\usepackage{subfigure}
 \usepackage[svgnames]{xcolor} % Specify colors by their 'svgnames', for a full list of all colors available see here: http://www.latextemplates.com/svgnames-colors
 
 \usepackage{times} % Use the times font
@@ -37,211 +37,161 @@
 \usepackage{wrapfig} % Allows wrapping text around tables and figures
 
 \begin{document}
-
-%----------------------------------------------------------------------------------------
-%	POSTER HEADER 
-%----------------------------------------------------------------------------------------
-
-% The header is divided into two boxes:
-% The first is 75% wide and houses the title, subtitle, names, university/organization and contact information
-% The second is 25% wide and houses a logo for your university/organization or a photo of you
-% The widths of these boxes can be easily edited to accommodate your content as you see fit
-
-\begin{minipage}[b]{0.75\linewidth}
-\veryHuge \color{NavyBlue} \textbf{Unnecessarily Complicated Research Title} \color{Black}\\ % Title
-\Huge\textit{An Exploration of Complexity}\\[2cm] % Subtitle
-\huge \textbf{John Smith \& James Smith}\\[0.5cm] % Author(s)
-\huge University and Department Name\\[0.4cm] % University/organization
-\Large \texttt{john@LaTeXTemplates.com} --- 1 (000) 111 1111\\
-\end{minipage}
-%
-\begin{minipage}[b]{0.25\linewidth}
-%\includegraphics[width=20cm]{logo.png}\\
-\end{minipage}
-
-\vspace{1cm} % A bit of extra whitespace between the header and poster content
-
-%----------------------------------------------------------------------------------------
-
-\begin{multicols}{2} % This is how many columns your poster will be broken into, a portrait poster is generally split into 2 columns
-
-%----------------------------------------------------------------------------------------
-%	ABSTRACT
-%----------------------------------------------------------------------------------------
-
-\color{Navy} % Navy color for the abstract
-
-\begin{abstract}
-
-Sed fringilla tempus hendrerit. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Etiam ut elit sit amet metus lobortis consequat sit amet in libero. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus vel sem magna. Nunc at convallis urna. isus ante. Pellentesque condimentum dui. Etiam sagittis purus non tellus tempor volutpat. Donec et dui non massa tristique adipiscing. Quisque vestibulum eros eu. Phasellus imperdiet, tortor vitae congue bibendum, felis enim sagittis lorem, et volutpat ante orci sagittis mi. Morbi rutrum laoreet semper. Morbi accumsan enim nec tortor consectetur non commodo nisi sollicitudin. Proin sollicitudin. Pellentesque eget orci eros. Fusce ultricies, tellus et pellentesque fringilla, ante massa luctus libero, quis tristique purus urna nec nibh.
-
-\end{abstract}
-
-%----------------------------------------------------------------------------------------
-%	INTRODUCTION
-%----------------------------------------------------------------------------------------
-
-\color{SaddleBrown} % SaddleBrown color for the introduction
-
-\section*{Introduction}
-
-Aliquam non lacus dolor, \textit{a aliquam quam} \cite{Smith:2012qr}. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Nulla in nibh mauris. Donec vel ligula nisi, a lacinia arcu. Sed mi dui, malesuada vel consectetur et, egestas porta nisi. Sed eleifend pharetra dolor, et dapibus est vulputate eu. \textbf{Integer faucibus elementum felis vitae fringilla.} In hac habitasse platea dictumst. Duis tristique rutrum nisl, nec vulputate elit porta ut. Donec sodales sollicitudin turpis sed convallis. Etiam mauris ligula, blandit adipiscing condimentum eu, dapibus pellentesque risus.
-
-\textit{Aliquam auctor}, metus id ultrices porta, risus enim cursus sapien, quis iaculis sapien tortor sed odio. Mauris ante orci, euismod vitae tincidunt eu, porta ut neque. Aenean sapien est, viverra vel lacinia nec, venenatis eu nulla. Maecenas ut nunc nibh, et tempus libero. Aenean vitae risus ante. Pellentesque condimentum dui. Etiam sagittis purus non tellus tempor volutpat. Donec et dui non massa tristique adipiscing.
-
-%----------------------------------------------------------------------------------------
-%	OBJECTIVES
-%----------------------------------------------------------------------------------------
-
-\color{DarkSlateGray} % DarkSlateGray color for the rest of the content
-
-\section*{Main Objectives}
-
-\begin{enumerate}
-\item Lorem ipsum dolor sit amet, consectetur.
-\item Nullam at mi nisl. Vestibulum est purus, ultricies cursus volutpat sit amet, vestibulum eu.
-\item Praesent tortor libero, vulputate quis elementum a, iaculis.
-\item Phasellus a quam mauris, non varius mauris. Fusce tristique, enim tempor varius porta, elit purus commodo velit, pretium mattis ligula nisl nec ante.
-\item Ut adipiscing accumsan sapien, sit amet pretium.
-\item Estibulum est purus, ultricies cursus volutpat
-\item Nullam at mi nisl. Vestibulum est purus, ultricies cursus volutpat sit amet, vestibulum eu.
-\item Praesent tortor libero, vulputate quis elementum a, iaculis.
-\end{enumerate}
-
-%----------------------------------------------------------------------------------------
-%	MATERIALS AND METHODS
-%----------------------------------------------------------------------------------------
-
-\section*{Materials and Methods}
-
-Fusce magna risus, molestie ut porttitor in, consectetur sed mi. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Pellentesque consectetur blandit pellentesque. Sed odio justo, viverra nec porttitor vel, lacinia a nunc. Suspendisse pulvinar euismod arcu, sit amet accumsan enim fermentum quis. In id mauris ut dui feugiat egestas. Vestibulum ac turpis lacinia nisl commodo sagittis eget sit amet sapien.
-
-%------------------------------------------------
-
-\subsection*{Mathematical Section}
-
-Nulla vel nisl sed mauris auctor mollis non sed. 
-
-\begin{equation}
-E = mc^{2}
-\label{eqn:Einstein}
-\end{equation}
-
-Curabitur mi sem, pulvinar quis aliquam rutrum. (1) edf (2)
-, $\Omega=[-1,1]^3$, maecenas leo est, ornare at. $z=-1$ edf $z=1$ sed interdum felis dapibus sem. $x$ set $y$ ytruem. 
-Turpis $j$ amet accumsan enim $y$-lacina; 
-ref $k$-viverra nec porttitor $x$-lacina. 
-
-Vestibulum ac diam a odio tempus congue. Vivamus id enim nisi:
-
-\begin{eqnarray}
-\cos\bar{\phi}_k Q_{j,k+1,t} + Q_{j,k+1,x}+\frac{\sin^2\bar{\phi}_k}{T\cos\bar{\phi}_k} Q_{j,k+1} &=&\nonumber\\ 
--\cos\phi_k Q_{j,k,t} + Q_{j,k,x}-\frac{\sin^2\phi_k}{T\cos\phi_k} Q_{j,k}\label{edgek}
-\end{eqnarray}
-and
-\begin{eqnarray}
-\cos\bar{\phi}_j Q_{j+1,k,t} + Q_{j+1,k,y}+\frac{\sin^2\bar{\phi}_j}{T\cos\bar{\phi}_j} Q_{j+1,k}&=&\nonumber \\
--\cos\phi_j Q_{j,k,t} + Q_{j,k,y}-\frac{\sin^2\phi_j}{T\cos\phi_j} Q_{j,k}.\label{edgej}
-\end{eqnarray} 
-
-Nulla sed arcu arcu. Duis et ante gravida orci venenatis tincidunt. Fusce vitae lacinia metus. Pellentesque habitant morbi. $\mathbf{A}\underline{\xi}=\underline{\beta}$ Vim $\underline{\xi}$ enum nidi $3(P+2)^{2}$ lacina. Id feugain $\mathbf{A}$ nun quis; magno.
-
-%----------------------------------------------------------------------------------------
-%	RESULTS 
-%----------------------------------------------------------------------------------------
-
-\section*{Results}
-
-Donec faucibus purus at tortor egestas eu fermentum dolor facilisis. Maecenas tempor dui eu neque fringilla rutrum. Mauris \emph{lobortis} nisl accumsan. Aenean vitae risus ante.
-%
-\begin{wraptable}{l}{12cm} % Left or right alignment is specified in the first bracket, the width of the table is in the second
-\begin{tabular}{l l l}
-\toprule
-\textbf{Treatments} & \textbf{Response 1} & \textbf{Response 2}\\
-\midrule
-Treatment 1 & 0.0003262 & 0.562 \\
-Treatment 2 & 0.0015681 & 0.910 \\
-Treatment 3 & 0.0009271 & 0.296 \\
-\bottomrule
-\end{tabular}
-\captionof{table}{\color{Green} Table caption}
-\end{wraptable}
-%
-Phasellus imperdiet, tortor vitae congue bibendum, felis enim sagittis lorem, et volutpat ante orci sagittis mi. Morbi rutrum laoreet semper. Morbi accumsan enim nec tortor consectetur non commodo nisi sollicitudin. Proin sollicitudin. Pellentesque eget orci eros. Fusce ultricies, tellus et pellentesque fringilla, ante massa luctus libero, quis tristique purus urna nec nibh.
-
-Nulla ut porttitor enim. Suspendisse venenatis dui eget eros gravida tempor. Mauris feugiat elit et augue placerat ultrices. Morbi accumsan enim nec tortor consectetur non commodo. Pellentesque condimentum dui. Etiam sagittis purus non tellus tempor volutpat. Donec et dui non massa tristique adipiscing. Quisque vestibulum eros eu. Phasellus imperdiet, tortor vitae congue bibendum, felis enim sagittis lorem, et volutpat ante orci sagittis mi. Morbi rutrum laoreet semper. Morbi accumsan enim nec tortor consectetur non commodo nisi sollicitudin.
-
-\begin{center}\vspace{1cm}
-\includegraphics[width=0.8\linewidth]{placeholder}
-\captionof{figure}{\color{Green} Figure caption}
-\end{center}\vspace{1cm}
-
-In hac habitasse platea dictumst. Etiam placerat, risus ac.
-
-Adipiscing lectus in magna blandit:
-
-\begin{center}\vspace{1cm}
-\begin{tabular}{l l l l}
-\toprule
-\textbf{Treatments} & \textbf{Response 1} & \textbf{Response 2} \\
-\midrule
-Treatment 1 & 0.0003262 & 0.562 \\
-Treatment 2 & 0.0015681 & 0.910 \\
-Treatment 3 & 0.0009271 & 0.296 \\
-\bottomrule
-\end{tabular}
-\captionof{table}{\color{Green} Table caption}
-\end{center}\vspace{1cm}
-
-Vivamus sed nibh ac metus tristique tristique a vitae ante. Sed lobortis mi ut arcu fringilla et adipiscing ligula rutrum. Aenean turpis velit, placerat eget tincidunt nec, ornare in nisl. In placerat.
-
-\begin{center}\vspace{1cm}
-\includegraphics[width=0.8\linewidth]{placeholder}
-\captionof{figure}{\color{Green} Figure caption}
-\end{center}\vspace{1cm}
-
-%----------------------------------------------------------------------------------------
-%	CONCLUSIONS
-%----------------------------------------------------------------------------------------
-
-\color{SaddleBrown} % SaddleBrown color for the conclusions to make them stand out
-
-\section*{Conclusions}
-
-\begin{itemize}
-\item Pellentesque eget orci eros. Fusce ultricies, tellus et pellentesque fringilla, ante massa luctus libero, quis tristique purus urna nec nibh. Phasellus fermentum rutrum elementum. Nam quis justo lectus.
-\item Vestibulum sem ante, hendrerit a gravida ac, blandit quis magna.
-\item Donec sem metus, facilisis at condimentum eget, vehicula ut massa. Morbi consequat, diam sed convallis tincidunt, arcu nunc.
-\item Nunc at convallis urna. isus ante. Pellentesque condimentum dui. Etiam sagittis purus non tellus tempor volutpat. Donec et dui non massa tristique adipiscing.
-\end{itemize}
-
-\color{DarkSlateGray} % Set the color back to DarkSlateGray for the rest of the content
-
-%----------------------------------------------------------------------------------------
-%	FORTHCOMING RESEARCH
-%----------------------------------------------------------------------------------------
-
-\section*{Forthcoming Research}
-
-Vivamus molestie, risus tempor vehicula mattis, libero arcu volutpat purus, sed blandit sem nibh eget turpis. Maecenas rutrum dui blandit lorem vulputate gravida. Praesent venenatis mi vel lorem tempor at varius diam sagittis. Nam eu leo id turpis interdum luctus a sed augue. Nam tellus.
-
- %----------------------------------------------------------------------------------------
-%	REFERENCES
-%----------------------------------------------------------------------------------------
-
-\nocite{*} % Print all references regardless of whether they were cited in the poster or not
-\bibliographystyle{plain} % Plain referencing style
-\bibliography{sample} % Use the example bibliography file sample.bib
-
-%----------------------------------------------------------------------------------------
-%	ACKNOWLEDGEMENTS
-%----------------------------------------------------------------------------------------
-
-\section*{Acknowledgements}
-
-Etiam fermentum, arcu ut gravida fringilla, dolor arcu laoreet justo, ut imperdiet urna arcu a arcu. Donec nec ante a dui tempus consectetur. Cras nisi turpis, dapibus sit amet mattis sed, laoreet.
-
-%----------------------------------------------------------------------------------------
-
-\end{multicols}
+	
+	%----------------------------------------------------------------------------------------
+	%	POSTER HEADER 
+	%----------------------------------------------------------------------------------------
+	
+	% The header is divided into two boxes:
+	% The first is 75% wide and houses the title, subtitle, names, university/organization and contact information
+	% The second is 25% wide and houses a logo for your university/organization or a photo of you
+	% The widths of these boxes can be easily edited to accommodate your content as you see fit
+	
+	\begin{minipage}[b]{0.75\linewidth}
+		\veryHuge \color{NavyBlue} \textbf{Experiments on Metric Learning Methods} \color{Black}\\ % Title
+		\huge \textbf{Shaoheng Liang and Yerong Li}\\[0.5cm] % Author(s)
+	\end{minipage}
+	
+	\vspace{1cm} % A bit of extra whitespace between the header and poster content
+	
+	%----------------------------------------------------------------------------------------
+	
+	\begin{multicols}{2} % This is how many columns your poster will be broken into, a portrait poster is generally split into 2 columns
+		
+		%----------------------------------------------------------------------------------------
+		%	ABSTRACT
+		%----------------------------------------------------------------------------------------
+		
+		\color{SaddleBrown} % SaddleBrown color for the introduction
+		
+		\section*{Introduction}
+		Metric learning is the task of learning a distance function on pair of objects. We experiment on three metric learning methods based on deep learning, including Siamese Network, Triplet Network and n-Tuple Network. The three approaches can be viewed as a framework that contains a set of network sharing parameters and a loss function integrating the outputs of the networks. The basic idea is to force the network to give shorter distance between similar instances and longer distance between dissimilar instances.
+		
+		We wrote a wrapper class for the network to hide the low-level implementation, and focus on the design of the high-level frameworks and loss functions. In our experiment on MNIST dataset and a classic network structure, Siamese Network has a mediocre performance while Triplet Network produces better embeddings. We are not able to make the original n-Tuple Network work. However, we have tested a few modified versions of it, which keep the framework unchanged but use different loss functions.
+		
+		%----------------------------------------------------------------------------------------
+		%	OBJECTIVES
+		%----------------------------------------------------------------------------------------
+		
+		\color{DarkSlateGray} % DarkSlateGray color for the rest of the content
+		
+		\section*{Main Objectives}
+		
+		\begin{enumerate}
+			\item Implement a toolkit for experimenting deep metric learning methods.
+			\item Experiment on Siamese, Triplet and n-Tuple Network and compare the results.
+			\item Explore possible extensions to these networks.
+		\end{enumerate}
+		
+		%------------------------------------------------
+		
+		\subsection*{Siamese Network}
+		\begin{center}\vspace{1cm}
+			\includegraphics[width=0.7\linewidth]{../report_shaoheng/siamese_struct}
+			\captionof{figure}{\color{Green} Structure of Siamese Network.}
+		\end{center}\vspace{1cm}
+		\begin{equation}
+		Loss = (1-S)L_S(\lvert y_1 - y_2 \rvert) + S L_D(\lvert y_1 - y_2 \rvert)
+		\end{equation}
+		\begin{equation}
+		L_S = \frac{1}{2}\lvert y_1 - y_2 \rvert^2
+		\end{equation}
+		\begin{equation}
+		L_D = \frac{1}{2}\{max(0, m-|y_1-y_2|)\}^2
+		\end{equation}
+		\subsection*{Triplet Network}
+		\begin{center}\vspace{1cm}
+			\includegraphics[width=0.7\linewidth]{../report_shaoheng/triplet_struct}
+			\captionof{figure}{\color{Green} Structure of Triplet Network.}
+		\end{center}\vspace{1cm}
+		\begin{equation}
+		Loss = \lvert(d_+, d_--1)\rvert^2 = const\bullet d_+^2
+		\end{equation}
+		\begin{equation}
+		d_+ = \frac{\exp{(\lvert y-y_+ \rvert)}}{\exp{(\lvert y-y_+ \rvert)} + \exp{(\lvert y-y_- \rvert)}}
+		\end{equation}
+		and
+		\begin{equation}
+		d_- = \frac{\exp{(\lvert y-y_- \rvert)}}{\exp{(\lvert y-y_+ \rvert)} + \exp{(\lvert y-y_- \rvert)}}
+		\end{equation}
+		\subsection*{n-Tuple Network}
+		
+		\begin{center}\vspace{1cm}
+			\includegraphics[width=0.7\linewidth]{../report_shaoheng/tuple_struct}
+			\captionof{figure}{\color{Green} Structure of n-Tuple Network.}
+		\end{center}\vspace{1cm}
+		\begin{equation}
+		L(\{x_i,x_i^+\}^N_{i=1})=\frac{1}{N}\log(\sum_{i=1}^N\exp(\sum_{j=1}^Ny^T_iy_j^+-y_i^Ty_i^+))  \label{eq:n-pair}
+		\end{equation}
+		
+		\nocite{*} % Print all references regardless of whether they were cited in the poster or not
+		\bibliographystyle{plain} % Plain referencing style
+		\bibliography{../report_shaoheng/egbib} % Use the example bibliography file sample.bib
+		
+		
+		\section*{Implementations}
+		To facilitate our experiment, we write a wrapper class \verb|Network| for convolutional network, which provides three member functions \verb|add_conv()|, \verb|add_fc()| and \verb|connect()|. The implementation of a Triplet Network is as easy as follows.
+		\begin{verbatim}
+		net = Network(28, 28, 1, 2);
+		net.add_conv(5, 5, 2, 2, 32);    net.add_conv(5, 5, 2, 2, 64);
+		net.add_fc(1024);                net.add_fc(256);
+		mid_output = net.connect(mid_input);
+		pos_output = net.connect(pos_input);
+		neg_output = net.connect(neg_input);
+		\end{verbatim}
+		However, the implementation of loss functions still needs hard work.
+		\section*{Results}
+		The Siamese Network can separate the classes fairly. Interesting overlappings between digits ``9'', ``7'' and ``4'' and between digits ``2'' and ``3'' is observed. In Triplet Network, these overlappings are further suppressed, which leads to a better separation.
+		\begin{center}\vspace{1cm}
+			\includegraphics[width=0.45\linewidth]{../report_shaoheng/siamese}
+			\includegraphics[width=0.45\linewidth]{../report_shaoheng/triplet}
+			\captionof{figure}{\color{Green} Left: Siamese Network; Right: Triplet Network}
+		\end{center}\vspace{1cm}
+		
+		The original network is impaired by a trivial all zero solution for dot product. As a result, all points shrinks to a very small area. Modified loss function involves the L2-Norm, which resolves the shrinking problem, but does not lead to a better separation.
+		\begin{equation}
+		Loss(\{x_i,x_i^+\}^N_{i=1})\notag
+		=\frac{1}{N}\log(\sum_{i=1}^N\exp(\sum_{j=1}^Ny^T_iy_j^+-y_i^Ty_i^+))+ \frac{\lambda}{2N} \sum_{i=1}^N(\lVert y_i\rVert^2+ \lVert y^+_i\rVert^2)
+		\end{equation}
+		
+		\begin{center}\vspace{1cm}
+			\includegraphics[width=0.45\linewidth]{../report_shaoheng/fail_tuple}
+			\includegraphics[width=0.45\linewidth]{../report_shaoheng/fig150}
+			\includegraphics[width=0.45\linewidth]{../report_shaoheng/first_tuple}
+			\includegraphics[width=0.45\linewidth]{../report_shaoheng/second_tuple}
+			\captionof{figure}{\color{Green} Top left: Original n-Tuple Network; Top right: n-Tuple Network with L2 Norm\\ Bottom left: n-Tuple Network with Triplet loss; Bottom right: n-Tuple Network with modified Triplet loss}
+		\end{center}\vspace{1cm}
+		
+		We directly use loss function on n-Tuple framework, which gives 90 triplets per 20 images, and produces a well separated but badly scattered figure. The reason may be the high dependency of the triplets. We designed a new loss function resembles the Triplet Network loss function but combines all 10 classes into one expression. As a result, the scattering is better but the separation is worse.
+		\begin{equation}
+		Loss = \frac{\exp{(\lvert y-y_+ \rvert)}}{\exp{(\lvert y-y_+ \rvert)} + \sum_i\exp{(\lvert y-y_-^i \rvert)}}
+		\end{equation}
+		%----------------------------------------------------------------------------------------
+		%	CONCLUSIONS
+		%----------------------------------------------------------------------------------------
+		
+		\color{SaddleBrown} % SaddleBrown color for the conclusions to make them stand out
+		
+		\section*{Conclusions}
+		
+		\begin{itemize}
+			\item Our wrapper class gives a good basis for metric learning experiments.
+			\item The Siamese Network and Triplet Network perform as expected. Triplet Network outperforms Siamese Network by reduce overlapping of digits that are easily get confused.
+			\item We are not able to reproduce the original n-Tuple Network, but we designed multiple loss function as partial fixes.
+		\end{itemize}
+		
+		\color{DarkSlateGray} % Set the color back to DarkSlateGray for the rest of the content
+		
+		%----------------------------------------------------------------------------------------
+		%	FORTHCOMING RESEARCH
+		%----------------------------------------------------------------------------------------
+		
+		\section*{Future Research}
+		
+		\begin{itemize}
+			\item Show quantitative comparison of the methods, although the difference performance is intuitive.
+			\item Combine the loss functions for n-Tuple to balance the scattering and the separation, or find new loss functions to get a better performance.
+		\end{itemize}
+		
+	\end{multicols}
 \end{document}
