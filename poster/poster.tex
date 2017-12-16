@@ -120,7 +120,7 @@
 			\captionof{figure}{\color{Green} Structure of n-Tuple Network.}
 		\end{center}\vspace{1cm}
 		\begin{equation}
-		L(\{x_i,x_i^+\}^N_{i=1})=\frac{1}{N}\log(\sum_{i=1}^N\exp(\sum_{j=1}^Ny^T_iy_j^+-y_i^Ty_i^+))  \label{eq:n-pair}
+		Loss(\{x_i,x_i^+\}^N_{i=1})=\frac{1}{N}\log(\sum_{i=1}^N\exp(\sum_{j=1}^Ny^T_iy_j^+-y_i^Ty_i^+))  \label{eq:n-pair}
 		\end{equation}
 		
 		\nocite{*} % Print all references regardless of whether they were cited in the poster or not
@@ -142,7 +142,7 @@
 		\end{verbatim}
 		However, the implementation of loss functions is still on case-by-case basis.
 		\section*{Results}
-		The Siamese Network can separate the classes fairly. Expectable overlappings between digits ``9'', ``7'' and ``4'' and between digits ``2'' and ``3'' is observed. In Triplet Network, these overlappings are further suppressed, which leads to a better separation.
+		The Siamese Network can separate the classes fairly. Expectable overlaps between digits ``9'', ``7'' and ``4'' and between digits ``2'' and ``3'' is observed. In Triplet Network, these overlappings are further suppressed, which leads to a better separation.
 		\begin{center}\vspace{1cm}
 			\includegraphics[width=0.45\linewidth]{../report_shaoheng/siamese}
 			\includegraphics[width=0.45\linewidth]{../report_shaoheng/triplet}
