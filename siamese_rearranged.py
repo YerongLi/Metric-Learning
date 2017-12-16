@@ -213,6 +213,8 @@ if __name__ == '__main__':
         plt.savefig('fig' + str(num) + '.png')
         plt.close()
 
+    rec = [];
+
     with tf.Session() as sess:
         sess.run(tf.global_variables_initializer())
 
@@ -235,3 +237,7 @@ if __name__ == '__main__':
                 images, labels = data.get_test()
                 output = sess.run(test_output, feed_dict={test_input: images})
                 plot(output, labels, i + 1)
+                rec.append(output)
+
+        with open('triplet_output.pkl') as file:
+            pkl.dump([labels, rec], file);

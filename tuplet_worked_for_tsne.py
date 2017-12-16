@@ -1,5 +1,4 @@
 import tensorflow as tf
-from tensorflow.examples.tutorials.mnist import input_data
 import itertools as it
 import numpy as np
 import pickle as pkl
@@ -15,6 +14,7 @@ class MnistData():
             with open('mnist.pkl', 'rb') as file:
                 mnist = pkl.load(file)
         except IOError:
+            from tensorflow.examples.tutorials.mnist import input_data
             mnist = input_data.read_data_sets("MNIST_data/", one_hot=False)
             with open('mnist.pkl', 'wb') as file:
                 pkl.dump(mnist, file)
@@ -67,6 +67,16 @@ class MnistData():
                         pos_images.append(self.train_images[l_yes.pop(), :, :, :])
                         neg_images.append(self.train_images[l_no.pop(), :, :, :])
         return mid_images, pos_images, neg_images
+
+    def get_tuplet_train_batch(self, b = 20):
+        images = []
+        for j in range(b):
+            for i in range(10):
+                l = np.random.choice(self.images_in_label[i], 2, replace=False).tolist()
+                images.append(self.train_images[l.pop(), :, :, :])
+                images.append(self.train_images[l.pop(), :, :, :])
+        return images
+
 
     def get_test(self):
         return self.test_images, self.test_labels
@@ -189,36 +199,42 @@ class Network:
 
 if __name__ == '__main__':
     data = MnistData() # Dataset
-    net = Network(28, 28, 1) # Network
+    net = Network(28, 28, 1, 20) # Network
 
     # Add layers to the network
     net.add_conv(5, 5, 2, 2, 32)
     net.add_conv(5, 5, 2, 2, 64)
     net.add_fc(1024) # the network will be flattened automatically
-    net.add_fc(256)
 
     # Build Siamese structure, will use GPU to calculate when possible
-    mid_input = tf.placeholder(tf.float32, [None, 28, 28, 1], name='mid_input')
-    pos_input = tf.placeholder(tf.float32, [None, 28, 28, 1], name='pos_input')
-    neg_input = tf.placeholder(tf.float32, [None, 28, 28, 1], name='neg_input')
-
-    mid_output = net.connect(mid_input)
-    pos_output = net.connect(pos_input)
-    neg_output = net.connect(neg_input)
+    train_input = tf.placeholder(tf.float32, [None, 28, 28, 1], name='input')
+    output = net.connect(train_input)
 
     # Use CPU do run test (in case graphic memory is insufficient)
     with tf.device('/cpu:0'):
         test_input = tf.placeholder(tf.float32, [None, 28, 28, 1], name='test_input')
         test_output = net.connect(test_input)
 
-    pos_exp_dist = tf.exp(tf.norm(mid_output - pos_output, axis=1, keep_dims=True))
-    neg_exp_dist = tf.exp(tf.norm(mid_output - neg_output, axis=1, keep_dims=True))
-    sum_exp_dist = pos_exp_dist + neg_exp_dist
+    normalized_output = output / tf.reduce_sum(tf.abs(output), axis=1, keep_dims=True)
+    reshaped_output = tf.reshape(output, [20, 10, 2, 20])
 
-    d_pos = pos_exp_dist / sum_exp_dist
-    d_neg = neg_exp_dist / sum_exp_dist
+    # reg = -tf.reduce_sum(output ** 2) / 400 / 2
 
-    total_loss = tf.reduce_mean(d_pos ** 2) + tf.reduce_mean((d_neg - 1) ** 2)
+    loss = []
+
+    for i in range(20):
+        modes = tf.squeeze(tf.slice(reshaped_output, [i, 0, 0, 0], [1, 10, 1, 20]))
+        mode = [tf.slice(modes, [j, 0], [1, 20]) for j in range(10)]
+        against = tf.squeeze(tf.slice(reshaped_output, [i, 0, 1, 0], [1, 10, 1, 20]))
+        for j in range(10):
+            exp_dist = tf.exp(tf.norm(mode[j] - against, axis=1, keep_dims=True))
+            for k in range(10):
+                if k != j:
+                    renorm = tf.slice(exp_dist, [k, 0], [1, 1]) + tf.slice(exp_dist, [j, 0], [1, 1])
+                    pos_loss = (tf.slice(exp_dist, [j, 0], [1, 1]) / renorm) ** 2
+                    neg_loss = (tf.slice(exp_dist, [k, 0], [1, 1]) / renorm - 1) ** 2
+                    loss.append((pos_loss + neg_loss) / 10 / 20)
+    total_loss = sum(loss)
 
     optimizer = tf.train.MomentumOptimizer(0.01, 0.99, use_nesterov=True).minimize(total_loss)
     # optimizer = tf.train.AdamOptimizer(0.001).minimize(total_loss)
@@ -230,36 +246,30 @@ if __name__ == '__main__':
         plt.savefig('fig' + str(num) + '.png')
         plt.close()
 
-    rec = []
-
     with tf.Session() as sess:
         sess.run(tf.global_variables_initializer())
 
-        images, labels = data.get_test()
-        output = sess.run(test_output, feed_dict={test_input: images})
-        plot(output, labels, 0)
+        #images, labels = data.get_test()
+        #output = sess.run(test_output, feed_dict={test_input: images})
+        #plot(output, labels, 0)
 
-        for i in range(5000):
-            mid_images, pos_images, neg_images = data.get_triplet_train_batch()
+        for i in range(2000):
+            images = data.get_tuplet_train_batch()
             if (i + 1) % 100 == 0:
-                #W0, b0 = sess.run([net.layers[0]['W'], net.layers[0]['b']])
-                #W1, b1 = sess.run([net.layers[1]['W'], net.layers[1]['b']])
-                #W2, b2 = sess.run([net.layers[2]['W'], net.layers[2]['b']])
-                #W2, b2 = sess.run([net.layers[3]['W'], net.layers[3]['b']])
                 _, loss = sess.run([optimizer, total_loss],
-                                   feed_dict={mid_input: mid_images, pos_input: pos_images, neg_input: neg_images})
-                #if np.isnan(loss):
-                #    print('!')
+                                   feed_dict={train_input: images})
                 print(i + 1, ': ', loss)
             else:
                 sess.run(optimizer,
-                         feed_dict={mid_input: mid_images, pos_input: pos_images, neg_input: neg_images})
+                         feed_dict={train_input: images})
 
-            if (i + 1) % 500 == 0:
-                images, labels = data.get_test()
-                output = sess.run(test_output, feed_dict={test_input: images})
-                plot(output, labels, i + 1)
-                rec.append(output)
+            #if (i + 1) % 500 == 0:
+                #images, labels = data.get_test()
+                #output = sess.run(test_output, feed_dict={test_input: images})
+                #plot(output, labels, i + 1)
+        images, labels = data.get_test()
+        output = sess.run(test_output, feed_dict={test_input: images})
 
-        with open('triplet_output.pkl') as file:
-            pkl.dump([labels, rec], file);
+        with open('tuplet_worked_for_tsne.pkl', 'wb') as file:
+            pkl.dump([labels, output], file)
+
