@@ -174,6 +174,8 @@ if __name__ == "__main__":
     with open('tuplet_worked_for_tsne.pkl', 'rb') as file:
         labels, X = READ.load(file);
     # labels = Math.loadtxt("mnist2500_labels.txt");
-    Y = tsne(X, labels, 2);
+    # Y = tsne(X, labels, 2);
+    Y = pca(X, 2);
     Plot.scatter(Y[:,0], Y[:,1], 20, labels);
-    Plot.show();
+    Plot.legend([str(i) for i in range(10)])
+    Plot.savefig('pca.png')

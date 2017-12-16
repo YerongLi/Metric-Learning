@@ -14,7 +14,7 @@
 % run, let it finish, and you should be clear).
 \usepackage[breaklinks=true,bookmarks=false]{hyperref}
 
-%\cvprfinalcopy % *** Uncomment this line for the final submission
+\cvprfinalcopy % *** Uncomment this line for the final submission
 
 \def\cvprPaperID{0000} % *** Enter the CVPR Paper ID here
 \def\httilde{\mbox{\tt\raisebox{-.5ex}{\symbol{126}}}}
@@ -204,7 +204,18 @@
 					\includegraphics[width=0.9\linewidth]{siamese}
 				\end{center}
 				\caption{Result of Siamese Network. The separation is fair. Some interesting substructure is notable (digit 4, 7 and 9; digit 2 and 3).\label{fig:siamese}}
-			\end{figure}	
+			\end{figure}
+			
+			The ratio of positive example to negative example is $10:45$ in this first try. We have test on different ratio to evaluate the importance of positive examples and negative examples. In particular, we use a ratio of $450:45$. The performance is greatly impaired, which is shown in figure \ref{fig:siamese_more_pos}. Digit ``2'', ``3'', ``5'' and ``7'' are hardly separated. The reason could be that Siamese network intrinsically needs more negative examples to separate similar examples, but less positive examples to just clustering a class of examples. 
+			
+			\begin{figure}[htbp]
+				\begin{center}
+					%\fbox{\rule{0pt}{2in} \rule{0.9\linewidth}{0pt}}
+					\includegraphics[width=0.9\linewidth]{siamese_more_pos}
+				\end{center}
+				\caption{Result of Siamese Network. The separation is fair. Some interesting substructure is notable (digit 4, 7 and 9; digit 2 and 3).\label{fig:siamese_more_pos}}
+			\end{figure}
+			
 		\subsection{Triplet Network}
 			The result of siamese network is shown in figure \ref{fig:triplet}. The 10 digits are separated very well. Digits 9, 7 and 4 are separated better and digits 2 and 3 are also well separated. Interestingly, we can see that the clusters of digit 9, 7 and 4 and digits 2 and 3 are still close to each other, which means the substructure is somewhat remained in the output.
 			\begin{figure}[htbp]
@@ -214,7 +225,7 @@
 				\end{center}
 				\caption{Result of Triplet Network.\label{fig:triplet}}
 			\end{figure}
-		\section{n-Tuple Network}
+		\subsection{n-Tuple Network}
 			We implement the original n-Tuple network using 10-tuples. However, the result in figure \ref{fig:fail_tuple} shows that the output points collapsed into one very little area.
 			One possible reason could be that because the dot product is on points that are not normalized, all 0's could be a trivial solution of the problem.
 			
@@ -274,7 +285,47 @@
 				\end{center}
 				\caption{Result of n-Tuple network with combined loss function. The scattering of points looks more ``normal'' but has a worse separation.\label{fig:second_tuple}}
 			\end{figure}
-	
+			
+			The reason why the n-Tuple Network with Triplet Network loss function has a bad distribution may also be that the method is not able to reduce the dimensionality into 2. Instead, we try 20-dimensional network output and use unsupervised method to further reduce the dimensionality.
+		\subsubsection{n-Tuple Network with PCA}
+			PCA is the most classical unsupervised linear dimensionality reduction method. We feed our 20-dimensional output into PCA, and the result is shown in figure \ref{fig:first_tuple_pca}. We can observe that the distribution is better than the previous result shown in figure \ref{fig:first_tuple}. This suggests that this model is able to work when the required output if of more dimensions. 
+			
+			\begin{figure}[htbp]
+				\begin{center}
+					%\fbox{\rule{0pt}{2in} \rule{0.9\linewidth}{0pt}}
+					\includegraphics[width=0.9\linewidth]{first_tuple_pca}
+				\end{center}
+				\caption{Result of n-Tuple Network using Triplet loss function, which output 20-dimensional vectors, and then post-processed by PCA.\label{fig:first_tuple_pca}}
+			\end{figure}
+		\subsubsection{n-Tuple Network with t-SNE}
+			There is no guarantee that the manifold in the high-dimensional space can be precisely shown by a linear method, PCA. Thus, we use t-SNE to retain more structures. t-SNE \cite{bengio2009learning} is a well-known unsupervised non-linear dimensionality reduction methods. We use t-SNE on the 20-dimensional output. The result is shown in \ref{fig:first_tuple_tsne}.
+			
+			\begin{figure}[htbp]
+				\begin{center}
+					%\fbox{\rule{0pt}{2in} \rule{0.9\linewidth}{0pt}}
+					\includegraphics[width=0.9\linewidth]{first_tuple_tsne}
+				\end{center}
+				\caption{Result of n-Tuple Network using Triplet loss function, which output 20-dimensional vectors, and then post-processed by t-SNE.\label{fig:first_tuple_tsne}}
+			\end{figure}
+			
+			We can compare our result against running t-SNE direct on the MNIST dataset reduced from $28\time 28$-dimensional images to $50$-dimensional vectors shown in figure \label{fig:tsne}. We can observe that the supervising information enhanced the performance of t-SNE. The examples from the same class is clustered more tightly. This phenomenon is more significant in the burn-in stage of t-SNE, which requires tighter clusters than the following steps. The result of it with our n-Tuple implementation is shown in figure \ref{fig:first_tuple_tsne_burnin}, where the points of each classes are clustered in to a small round area. In contrast, the t-SNE burn-in result using only the original dataset in image \ref{fig:tsne_burnin} shown that some classes are not well separable, and the shape of each cluster is also not round. This suggests that the supervised metric learning does create a better embedding for the data.
+			
+			\begin{figure}[htbp]
+				\begin{center}
+					%\fbox{\rule{0pt}{2in} \rule{0.9\linewidth}{0pt}}
+					\includegraphics[width=0.9\linewidth]{first_tuple_tsne_burnin}
+				\end{center}
+				\caption{Burn-in result of t-SNE, with n-Tuple.\label{fig:first_tuple_tsne_burnin}}
+			\end{figure}
+
+			\begin{figure}[htbp]
+				\begin{center}
+					%\fbox{\rule{0pt}{2in} \rule{0.9\linewidth}{0pt}}
+					\includegraphics[width=0.9\linewidth]{tsne_burnin}
+				\end{center}
+				\caption{Burn-in result of t-SNE, on original dataset.\label{fig:tsne_burnin}}
+			\end{figure}
+			
 	\section{Conclusion \label{sec:Conc}}
 		We have implemented a backend for experimenting metric learning methods. We experimented three frameworks, Siamese Network, Triplet Network and n-Tuple Network on MNIST dataset. Siamese Network shows a fair performance while Triplet Network outperforms Siamese as expected. However, the original n-Tuple Network does not work in our experiments and our modification on the loss function gives a partly work version.
 	{\small

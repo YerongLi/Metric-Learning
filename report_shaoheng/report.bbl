@@ -1,5 +1,11 @@
 \begin{thebibliography}{1}
 
+\bibitem{bengio2009learning}
+Y.~Bengio et~al.
+\newblock Learning deep architectures for ai.
+\newblock {\em Foundations and trends{\textregistered} in Machine Learning},
+  2(1):1--127, 2009.
+
 \bibitem{hadsell2006dimensionality}
 R.~Hadsell, S.~Chopra, and Y.~LeCun.
 \newblock Dimensionality reduction by learning an invariant mapping.
