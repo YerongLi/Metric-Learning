@@ -340,6 +340,16 @@
 			\end{figure}
 
 	The sampling method is intuitive in the sense that it takes full advantage of the training batches in the neural network training by lifting the vector of pairwise distances within the batch to the matrix of pairwise distances. Figure \ref{fig:lift} gives an illustration. 
+
+	As suggested in paper \cite{lifted}, sampling negative examples oriented to the positive instance, the training is done on the loss function 
+	\begin{equation}
+		L=\frac{1}{|\mathcal{P}|}\sum_{(i,j)\in \mathcal{P}}\max(0, L_{i,j})
+	\end{equation}
+	where
+	\begin{equation}
+		L_{i,j}=\max\{\max_{(i,k)\in\mathcal{N}}\alpha-D_{i,k}, \max_{(j,l)\in\mathcal{N}}\alpha-D_{j,l}\}+D_{i,j}\label{eq:leftij}
+	\end{equation}
+	and $\mathcal{P}$ and $\mathcal{N}$ are sampled postive and negative pairs with $D$.current step metric. And due to non-convexity in \ref{eq:leftij}, the training should be tricky\cite{lifted}.
 	\section{Conclusion \label{sec:Conc}}
 		We have implemented a backend for experimenting metric learning methods. We experimented three frameworks, Siamese Network, Triplet Network and n-Tuple Network on MNIST dataset. Siamese Network shows a fair performance while Triplet Network outperforms Siamese as expected. However, the original n-Tuple Network does not work in our experiments and our modification on the loss function gives a partly work version.
 	{\small
