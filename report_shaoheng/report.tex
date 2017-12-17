@@ -241,7 +241,7 @@
 			
 			\begin{align}
 			&L(\{x_i,x_i^+\}^N_{i=1})\notag\\
-			=&\frac{1}{N}\log(\sum_{i=1}^N\exp(\sum_{j=1}^Ny^T_iy_j^+-y_i^Ty_i^+))+ \frac{\lambda}{2N} \sum_{i=1}^N(\lvert y_i\rvert^2+ \lvert y^+_i\rvert^2)
+			=&\frac{1}{N}\log(\sum_{i=1}^N\exp(\sum_{j=1}^Ny^T_iy_j^+-y_i^Ty_i^+))+ \frac{\lambda}{2N} \sum_{i=1}^N(\lvert y_i\rvert^2+ \lvert y^+_i\rvert^2) \label{eq:pair}
 			\end{align}
 			
 			\begin{figure}[t]
@@ -293,9 +293,9 @@
 			\begin{figure}[htbp]
 				\begin{center}
 					%\fbox{\rule{0pt}{2in} \rule{0.9\linewidth}{0pt}}
-					\includegraphics[width=0.9\linewidth]{first_tuple_pca}
+					\includegraphics[width=0.5\linewidth]{first_tuple_pca}\includegraphics[width=0.5\linewidth]{pca2}
 				\end{center}
-				\caption{Result of n-Tuple Network using Triplet loss function, which output 20-dimensional vectors, and then post-processed by PCA.\label{fig:first_tuple_pca}}
+				\caption{Left: Results of n-Tuple Network using Triplet loss function, which output 20-dimensional vectors, and then post-processed by PCA. Right: Results using n-pair loss in equation which output 40-dimensional vectors, and then post-processed by PCA\ref{eq:n-pair} \label{fig:first_tuple_pca}}
 			\end{figure}
 		\subsubsection{n-Tuple Network with t-SNE}
 			There is no guarantee that the manifold in the high-dimensional space can be precisely shown by a linear method, PCA. Thus, we use t-SNE to retain more structures. t-SNE \cite{bengio2009learning} is a well-known unsupervised non-linear dimensionality reduction methods. We use t-SNE on the 20-dimensional output. The result is shown in \ref{fig:first_tuple_tsne}.
