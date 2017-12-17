@@ -279,18 +279,16 @@
 				\begin{figure}[t]
 				
 				\begin{center}
-					\includegraphics[width=0.4\linewidth]{constrastiveDemo}\includegraphics[width=0.5\linewidth]{fig600}
-					\includegraphics[width=0.5\linewidth]{fig2500}
-					\caption{3-pair loss with constraint $\lambda (L_2)^2[\lambda=1.0]$ and $\lambda L_2[\lambda=1.0]$;10-pair loss with constraint $\lambda (L_2)^2[\lambda=1.0]$, and 10-pair sampling fails after long run}
+					\includegraphics[width=0.5\linewidth]{constrastiveDemo}\includegraphics[width=0.5\linewidth]{tripletDemo}
+					\caption{Constrastive Sampling and Triplet Sampling}
+					\includegraphics[width=0.5\linewidth]{liftedDemo}
+					\caption{Lifted Structured Feature Embedding, sampling oriented to the positive samples}
 					%\fbox{\rule{0pt}{2in} \rule{0.9\linewidth}{0pt}}
-					\includegraphics[width=0.9\linewidth]{fig150}
 				\end{center}
-				\caption{3-pair loss with $\lambda L_2$ constraint and weight $\lambda=0.3$.  We also added negative cutoff $m$ in equation \ref{eq:negative}, this proves improve the training result.}
-				
-				
-				Another observation is that while optimizing contrastive loss and triplet loss is approachable for momentum optimizer, we could hardly optimize $(N+1)-$pair loss with it: it is harder to optimize $(N+1)-$pair loss. 
+			Deep Metric Learning via Lifted Structured Feature Embedding
 			\end{figure}
-would use
+
+	The sampling method is intuitive in the sense that it takes full advantage of the training batches in the neural network training by lifting the vector of pairwise distances within the batch to the matrix of pairwise distances. 
 	\section{Conclusion \label{sec:Conc}}
 		We have implemented a backend for experimenting metric learning methods. We experimented three frameworks, Siamese Network, Triplet Network and n-Tuple Network on MNIST dataset. Siamese Network shows a fair performance while Triplet Network outperforms Siamese as expected. However, the original n-Tuple Network does not work in our experiments and our modification on the loss function gives a partly work version.
 	{\small

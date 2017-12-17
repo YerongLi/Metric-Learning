@@ -241,7 +241,7 @@
 			
 			\begin{align}
 			&L(\{x_i,x_i^+\}^N_{i=1})\notag\\
-			=&\frac{1}{N}\log(\sum_{i=1}^N\exp(\sum_{j=1}^Ny^T_iy_j^+-y_i^Ty_i^+))+ \frac{\lambda}{2N} \sum_{i=1}^N(\lVert y_i\rVert^2+ \lVert y^+_i\rVert^2)
+			=&\frac{1}{N}\log(\sum_{i=1}^N\exp(\sum_{j=1}^Ny^T_iy_j^+-y_i^Ty_i^+))+ \frac{\lambda}{2N} \sum_{i=1}^N(\lvert y_i\rvert^2+ \lvert y^+_i\rvert^2)
 			\end{align}
 			
 			\begin{figure}[t]
@@ -325,7 +325,21 @@
 				\end{center}
 				\caption{Burn-in result of t-SNE, on original dataset.\label{fig:tsne_burnin}}
 			\end{figure}
-			
+	\section{Furture work}
+	In addition to the contrastive, triplet and $(N+1)$-tuple embeddings in this report. Another pratical embedding in literature one should notice is the lifted structure embedding. We also takes $N$ samples as a training group. In lifted structure approach training batch to be not completely random as $(N+1)$ tuple sampling, but integrate elements of importance sampling: choosing positive elements and random and generate "important" negative samples oriented to the positive examples. This is intuitive in the sense that when seeing squared loss as repulsive harmonic potentials, we can push apart "important" negative pairs. 
+				\begin{figure}[t]
+				
+				\begin{center}
+					\includegraphics[width=0.5\linewidth]{constrastiveDemo}\includegraphics[width=0.5\linewidth]{tripletDemo}
+					\caption{Constrastive Sampling and Triplet Sampling}
+					\includegraphics[width=0.5\linewidth]{liftedDemo}
+					\caption{Lifted Structured Feature Embedding, sampling oriented to the positive samples\label{fig:lift}}
+					%\fbox{\rule{0pt}{2in} \rule{0.9\linewidth}{0pt}}
+				\end{center}
+			Deep Metric Learning via Lifted Structured Feature Embedding (In this section, figures are from original paper \cite{lifted}) 
+			\end{figure}
+
+	The sampling method is intuitive in the sense that it takes full advantage of the training batches in the neural network training by lifting the vector of pairwise distances within the batch to the matrix of pairwise distances. Figure \ref{fig:lift} gives an illustration. 
 	\section{Conclusion \label{sec:Conc}}
 		We have implemented a backend for experimenting metric learning methods. We experimented three frameworks, Siamese Network, Triplet Network and n-Tuple Network on MNIST dataset. Siamese Network shows a fair performance while Triplet Network outperforms Siamese as expected. However, the original n-Tuple Network does not work in our experiments and our modification on the loss function gives a partly work version.
 	{\small
