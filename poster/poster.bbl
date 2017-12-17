@@ -1,5 +1,11 @@
 \begin{thebibliography}{1}
 
+\bibitem{bengio2009learning}
+Yoshua Bengio et~al.
+\newblock Learning deep architectures for ai.
+\newblock {\em Foundations and trends{\textregistered} in Machine Learning},
+  2(1):1--127, 2009.
+
 \bibitem{hadsell2006dimensionality}
 Raia Hadsell, Sumit Chopra, and Yann LeCun.
 \newblock Dimensionality reduction by learning an invariant mapping.
@@ -10,6 +16,12 @@ Raia Hadsell, Sumit Chopra, and Yann LeCun.
 Elad Hoffer and Nir Ailon.
 \newblock Deep metric learning using triplet network.
 \newblock {\em CoRR}, abs/1412.6622, 2014.
+
+\bibitem{lifted}
+Stefanie Jegelka Silvio~Savarese Hyun Oh~Song, Yu~Xiang.
+\newblock Deep metric learning via lifted structured feature embedding.
+\newblock In {\em Computer vision and pattern recognition, 2016 IEEE computer
+  society conference on}, pages 4004--4012, 2016.
 
 \bibitem{sohn2016improved}
 Kihyuk Sohn.
