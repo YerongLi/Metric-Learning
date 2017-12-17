@@ -127,7 +127,7 @@
 		\bibliographystyle{plain} % Plain referencing style
 		\bibliography{../report_shaoheng/egbib} % Use the example bibliography file sample.bib
 		
-		
+		\vspace{-1em}
 		\section*{Implementations}
 		To facilitate our experiment, we write a wrapper class \verb|Network| for convolutional network, which provides three member functions \verb|add_conv()|, \verb|add_fc()| and \verb|connect()|. The implementation of a Triplet Network is as easy as follows.
 		\begin{verbatim}
@@ -152,18 +152,17 @@
 		The original network is impaired by a trivial all zero solution for dot product. As a result, all points shrinks to a very small area. Modified loss function involves the L2-Norm, which resolves the shrinking problem, but does not lead to a better separation.
 		\begin{equation}
 		Loss(\{x_i,x_i^+\}^N_{i=1})\notag
-		=\frac{1}{N}\log(\sum_{i=1}^N\exp(\sum_{j=1}^Ny^T_iy_j^+-y_i^Ty_i^+))+ \frac{\lambda}{2N} \sum_{i=1}^N(\lVert y_i\rVert^2+ \lVert y^+_i\rVert^2)
+		=\frac{1}{N}\log(\sum_{i=1}^N\exp(\sum_{j=1}^Ny^T_iy_j^+-y_i^Ty_i^+))+ \frac{\lambda}{2N} \sum_{i=1}^N(\lvert y_i\rvert^2+ \lvert y^+_i\rvert^2)
 		\end{equation}
 		
-		\begin{center}\vspace{1cm}
+		\begin{center}\vspace{-1cm}
 			\includegraphics[width=0.45\linewidth]{../report_shaoheng/fail_tuple}
 			\includegraphics[width=0.45\linewidth]{../report_shaoheng/fig150}
 			\includegraphics[width=0.45\linewidth]{../report_shaoheng/first_tuple}
 			\includegraphics[width=0.45\linewidth]{../report_shaoheng/second_tuple}
 			\captionof{figure}{\color{Green} Top left: Original n-Tuple Network; Top right: n-Tuple Network with L2 Norm\\ Bottom left: n-Tuple Network with Triplet loss; Bottom right: n-Tuple Network with modified Triplet loss}
 		\end{center}\vspace{1cm}
-		
-		We directly use Triplet loss function on n-Tuple framework, which gives 90 triplets per 20 images, and produces a well separated but badly scattered figure. The reason of the strange scattering may be the high dependency of the triplets. To solve this problem, we designed a new loss function resembles the Triplet Network loss function but combines all 10 classes into one expression. As a result, the scattering is better but the separation is worse.
+		We directly use Triplet loss function on n-Tuple framework, which gives 90 triplets per 20 images, and produces a well separated but badly scattered figure. The reason of the strange scattering may be the high dependency of the triplets. To solve this problem, we designed a new loss function resembles the Triplet Network loss function but combines all 10 classes into one expression. %As a result, the scattering is better but the separation is worse.
 		\begin{equation}
 		Loss = \frac{\exp{(\lvert y-y_+ \rvert)}}{\exp{(\lvert y-y_+ \rvert)} + \sum_i\exp{(\lvert y-y_-^i \rvert)}}
 		\end{equation}
@@ -172,7 +171,7 @@
 		%----------------------------------------------------------------------------------------
 		
 		\color{SaddleBrown} % SaddleBrown color for the conclusions to make them stand out
-		
+		\vspace{-1em}
 		\section*{Conclusions}
 		
 		\begin{itemize}
@@ -188,7 +187,6 @@
 		%----------------------------------------------------------------------------------------
 		
 		\section*{Future Research}
-		
 		\begin{itemize}
 			\item Show quantitative comparison of the methods, although the difference performance is intuitive.
 			\item Combine the loss functions for n-Tuple to balance the scattering and the separation, or find new loss functions to get a better performance.
