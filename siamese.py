@@ -1,4 +1,5 @@
 import tensorflow as tf
+from tensorflow.examples.tutorials.mnist import input_data
 import itertools as it
 import numpy as np
 import pickle as pkl
@@ -10,7 +11,6 @@ class MnistData:
             with open('mnist.pkl', 'rb') as file:
                 mnist = pkl.load(file)
         except IOError:
-            from tensorflow.examples.tutorials.mnist import input_data
             mnist = input_data.read_data_sets("MNIST_data/", one_hot=False)
             with open('mnist.pkl', 'wb') as file:
                 pkl.dump(mnist, file)
