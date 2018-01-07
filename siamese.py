@@ -4,7 +4,11 @@ import itertools as it
 import numpy as np
 import pickle as pkl
 from matplotlib import pyplot as plt
-
+#'aarch64'==platform.machine()
+max_step = 10000
+test_itv = 200
+plot_itv = 500
+test_batch_size = 10
 class MnistData:
     def __init__(self):
         try:
@@ -109,9 +113,9 @@ label_input = tf.placeholder(tf.float32, [None, 1], name='label_input')
 left_output = build_network(left_input)
 right_output = build_network(right_input)
 
-with tf.device('/cpu:0'):
-    test_input = tf.placeholder(tf.float32, [None, 28, 28, 1], name='test_input')
-    test_output = build_network(test_input)
+
+test_input = tf.placeholder(tf.float32, [None, 28, 28, 1], name='test_input')
+test_output = build_network(test_input)
 
 def calc_loss(model1, model2, y, margin):
     with tf.name_scope("contrastive-loss"):
@@ -124,8 +128,6 @@ margin = 0.2
 total_loss = calc_loss(left_output, right_output, label_input, margin)
 
 optimizer = tf.train.AdamOptimizer(0.001).minimize(total_loss)
-optimizer = tf.train.MomentumOptimizer(0.01, 0.99, use_nesterov=True).minimize(total_loss)
-#optimizer = tf.train.MomentumOptimizer(0.01, 0.99, use_nesterov=True).minimize(total_loss)
 
 data = MnistData()
 
@@ -133,27 +135,32 @@ with tf.Session() as sess:
     sess.run(tf.global_variables_initializer())
 
     images, labels = data.get_test()
-    output = sess.run(test_output, feed_dict={test_input: images})
-    for j in range(10):
-        plt.scatter(output[labels == j, 0], output[labels == j, 1], 5)
+    chunks_img = [images[x:x+test_batch_size] for x in range(0, len(images), test_batch_size)]
+    chunks_lbl = [labels[x:x+test_batch_size] for x in range(0, len(labels), test_batch_size)]
+#    for group in range(len(chunks_img)):    
+    for group in range(1):
+        output = sess.run(test_output, feed_dict={test_input: chunks_img[group]})
+        for j in range(10):
+            plt.scatter(output[chunks_lbl[group] == j, 0], output[chunks_lbl[group] == j, 1], 5)
     plt.legend([str(i) for i in range(10)])
-    plt.legend()
     plt.savefig('fig0.png')
     plt.close()
 
-    for i in range(10000):
+
+    for i in range(max_step):
         left_images, right_images, labels = data.get_train_batch()
-        if (i + 1) % 100 == 0:
+        if (i + 1) % test_itv == 0:
             _, loss = sess.run([optimizer, total_loss], feed_dict={left_input: left_images, right_input: right_images, label_input: labels})
             print(i+1, ': ', loss)
         else:
             sess.run(optimizer, feed_dict={left_input: left_images, right_input: right_images, label_input: labels})
 
-        if (i + 1) % 200 == 0:
-            images, labels = data.get_test()
-            output = sess.run(test_output, feed_dict={test_input: images})
-            for j in range(10):
-                plt.scatter(output[labels == j, 0], output[labels == j, 1], 5)
-            plt.legend([str(i) for i in range(10)])
+        if (i + 1) % plot_itv == 0:
+            for group in range(len(chunks_img)):
+                output = sess.run(test_output, feed_dict={test_input: chunks_img[group]})
+                for j in range(10):
+                    plt.scatter(output[chunks_lbl[group] == j, 0], output[chunks_lbl[group] == j, 1], 5)
+            plt.legend([str(idx) for idx in range(10)])
             plt.savefig('fig' + str(i + 1) + '.png')
             plt.close()
+
