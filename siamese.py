@@ -18,10 +18,11 @@ class MnistData:
             mnist = input_data.read_data_sets("MNIST_data/", one_hot=False)
             with open('mnist.pkl', 'wb') as file:
                 pkl.dump(mnist, file)
-
-        self.train_images = mnist.train.images.reshape((-1, 28, 28, 1))
+        ## 55000 training images, each image is flatten as a 784-d vector
+        self.train_images = mnist.train.images.reshape((-1, 28, 28, 1)) # np.reshape train_images to (55000, 28, 28, 1)
         self.train_labels = mnist.train.labels
-        self.test_images = mnist.test.images.reshape((-1, 28, 28, 1))
+        ## 10000 testing images, each image is flatten as a 784-d vector
+        self.test_images = mnist.test.images.reshape((-1, 28, 28, 1))   # np.reshape test_images to (10000, 28, 28, 1) 
         self.test_labels = mnist.test.labels
 
         self.train_amt = self.train_images.shape[0]
