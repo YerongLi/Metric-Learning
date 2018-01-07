@@ -4,9 +4,11 @@ import itertools as it
 import numpy as np
 import pickle as pkl
 from matplotlib import pyplot as plt
+#'aarch64'==platform.machine()
 max_step = 10
 test_itv = 2
 plot_itv = 5
+test_batch_size = 10
 class MnistData:
     def __init__(self):
         try:
@@ -126,8 +128,6 @@ margin = 0.2
 total_loss = calc_loss(left_output, right_output, label_input, margin)
 
 optimizer = tf.train.AdamOptimizer(0.001).minimize(total_loss)
-#optimizer = tf.train.MomentumOptimizer(0.01, 0.99, use_nesterov=True).minimize(total_loss)
-#optimizer = tf.train.MomentumOptimizer(0.01, 0.99, use_nesterov=True).minimize(total_loss)
 
 data = MnistData()
 
@@ -135,15 +135,17 @@ with tf.Session() as sess:
     sess.run(tf.global_variables_initializer())
 
     images, labels = data.get_test()
-    images = images[0:10]
-    labels = labels[0:10]
-    output = sess.run(test_output, feed_dict={test_input: images})
-    for j in range(10):
-        plt.scatter(output[labels == j, 0], output[labels == j, 1], 5)
+    chunks_img = [images[x:x+test_batch_size] for x in range(0, len(images), test_batch_size)]
+    chunks_lbl = [labels[x:x+test_batch_size] for x in range(0, len(labels), test_batch_size)]
+#    for group in range(len(chunks_img)):    
+    for group in range(1):
+        output = sess.run(test_output, feed_dict={test_input: chunks_img[group]})
+        for j in range(10):
+            plt.scatter(output[chunks_lbl[group] == j, 0], output[chunks_lbl[group] == j, 1], 5)
     plt.legend([str(i) for i in range(10)])
-    plt.legend()
     plt.savefig('fig0.png')
     plt.close()
+
 
     for i in range(max_step):
         left_images, right_images, labels = data.get_train_batch()
@@ -154,13 +156,11 @@ with tf.Session() as sess:
             sess.run(optimizer, feed_dict={left_input: left_images, right_input: right_images, label_input: labels})
 
         if (i + 1) % plot_itv == 0:
-            images, labels = data.get_test()
-            images = images[0:10]
-            labels = labels[0:10]
-            output = sess.run(test_output, feed_dict={test_input: images})
-            for j in range(10):
-                plt.scatter(output[labels == j, 0], output[labels == j, 1], 5)
-            plt.legend([str(i) for i in range(10)])
+            for group in range(len(chunks_img)):
+                output = sess.run(test_output, feed_dict={test_input: chunks_img[group]})
+                for j in range(10):
+                    plt.scatter(output[chunks_lbl[group] == j, 0], output[chunks_lbl[group] == j, 1], 5)
+            plt.legend([str(idx) for idx in range(10)])
             plt.savefig('fig' + str(i + 1) + '.png')
             plt.close()
 
