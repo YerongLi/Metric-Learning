@@ -7,9 +7,11 @@ from matplotlib import pyplot as plt
 import math
 num_label = 10
 max_step =10000
-div = 100
+test_itv = 200
+plot_itv = 500
+test_batch_size = 10
 d = 10
-number_group = math.ceil(float(500)/d)
+number_group = math.ceil(float(100)/d)
 class MnistData():
     """
     Arrange MNIST data set to suit siamese networking training
@@ -81,29 +83,7 @@ class MnistData():
                         pos_images.append(self.train_images[l_yes.pop(), :, :, :])
                         neg_images.append(self.train_images[l_no.pop(), :, :, :])
         return mid_images, pos_images, neg_images
-    '''
-    def get_tuple_train_batch(self, NUM=d):
-
-        samples= []
-        data = []
-        assert NUM < num_label, 'NUM has to be smaller than number of labels'
-        
-        # number_group = math.ceil(float(500)/(NUM+1))
-        # number_group = 3 #DEBUG
-        for group in range(number_group):
-            label = np.random.permutation(range(num_label))[0:NUM]
-            
-            samples = [np.random.choice(self.images_in_label[label[i]], 2, replace=False).tolist() for i in range(NUM)]
-            #  print(samples, 'samples')
-            new_data = [[samples[i][np.random.choice([0,1])] for i in range(NUM)] for j in range(NUM)]
-            for i in range(NUM) : 
-                del new_data[i][i]
-                new_data[i] = samples[i]+new_data[i]
-   
-            data = data+list(map(self.return_train_images, new_data))
-
-        return np.array(data)
-    '''
+    
     def get_pair_train_batch(self, NUM=d):
         '''
             Generate  pairs of NUM+1 tuplets
@@ -283,13 +263,14 @@ if __name__ == '__main__':
             tempLog =tf.log(tf.reduce_sum(tf.exp(exponents)))
             loss.append(tempLog)
     NORM = tf.norm(piv_output,axis=1, keep_dims=True) + tf.norm(pos_output,axis=1, keep_dims=True)
-    total_loss = tf.reduce_mean(loss)+tf.reduce_mean(NORM)**2*0.3
+    total_loss = tf.reduce_mean(loss)+tf.reduce_mean(NORM)*0.9
     #total_loss = tf.reduce_mean(loss)+tf.reduce_mean(tf.exp(NORM-1))**2*0.01
 
     #optimizer = tf.train.MomentumOptimizer(0.01, 0.99, use_nesterov=True).minimize(total_loss)
     optimizer = tf.train.AdamOptimizer(0.001).minimize(total_loss)
 
     def plot(output, labels, num):
+        
         for j in range(10):
             plt.scatter(output[labels == j, 0], output[labels == j, 1], 5)
         plt.legend([str(i) for i in range(10)])
@@ -300,8 +281,16 @@ if __name__ == '__main__':
         sess.run(tf.global_variables_initializer())
 
         images, labels = data.get_test()
-        output = sess.run(test_output, feed_dict={test_input: images})
-        plot(output, labels, 0)
+        chunks_img = [images[x:x+test_batch_size] for x in range(0, len(images), test_batch_size)]
+        chunks_lbl = [labels[x:x+test_batch_size] for x in range(0, len(labels), test_batch_size)]
+        #    for group in range(len(chunks_img)):    
+        for group in range(1):
+            output = sess.run(test_output, feed_dict={test_input: chunks_img[group]})
+            for j in range(10):
+                plt.scatter(output[chunks_lbl[group] == j, 0], output[chunks_lbl[group] == j, 1], 5)
+        plt.legend([str(i) for i in range(10)])
+        plt.savefig('fig0.png')
+        plt.close()
 
         for i in range(max_step):
             # mid_images, pos_images, neg_images = data.get_triplet_train_batch()
@@ -315,7 +304,7 @@ if __name__ == '__main__':
             print(np.array(test_batch).shape)           
             '''
             ## DEBUG
-            if (i + 1) % div == 0:
+            if (i + 1) % test_itv == 0:
                 #W0, b0 = sess.run([net.layers[0]['W'], net.layers[0]['b']])
                 #W1, b1 = sess.run([net.layers[1]['W'], net.layers[1]['b']])
                 #W2, b2 = sess.run([net.layers[2]['W'], net.layers[2]['b']])
@@ -330,8 +319,11 @@ if __name__ == '__main__':
             else:
                 sess.run(optimizer,
                          feed_dict={piv_input: piv_images, pos_input: pos_images})
-
-            if (i + 1) % 500 == 0:
-                images, labels = data.get_test()
-                output = sess.run(test_output, feed_dict={test_input: images})
-                plot(output, labels, i + 1)
+            if (i + 1) % plot_itv == 0:
+                for group in range(len(chunks_img)):
+                    output = sess.run(test_output, feed_dict={test_input: chunks_img[group]})
+                    for j in range(10):
+                        plt.scatter(output[chunks_lbl[group] == j, 0], output[chunks_lbl[group] == j, 1], 5)
+                plt.legend([str(i) for i in range(10)])
+                plt.savefig('fig' + str(i + 1) + '.png')
+                plt.close()
